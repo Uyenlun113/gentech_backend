@@ -45,9 +45,7 @@ export class CategoryCustomerService {
 
     async findAll(queryDto: QueryCustomerDto) {
         const { search, status, dateFrom, dateTo, page = 1, limit = 10 } = queryDto;
-
         const queryBuilder = this.customerRepository.createQueryBuilder('customer');
-
         if (search) {
             queryBuilder.andWhere(
                 `(customer.ma_kh LIKE :search 
@@ -57,25 +55,19 @@ export class CategoryCustomerService {
                 { search: `%${search}%` }
             );
         }
-
         if (status) {
             queryBuilder.andWhere('customer.status = :status', { status });
         }
-
         if (dateFrom && dateTo) {
             queryBuilder.andWhere('customer.date BETWEEN :dateFrom AND :dateTo', {
                 dateFrom: new Date(dateFrom),
                 dateTo: new Date(dateTo),
             });
         }
-
         const skip = (page - 1) * limit;
-
         queryBuilder.skip(skip).take(limit);
         queryBuilder.orderBy('customer.date', 'DESC');
-
         const [data, total] = await queryBuilder.getManyAndCount();
-
         return {
             data,
             pagination: {
@@ -92,17 +84,14 @@ export class CategoryCustomerService {
         const customer = await this.customerRepository.findOne({
             where: { ma_kh }
         });
-
         if (!customer) {
             throw new NotFoundException('Không tìm thấy khách hàng');
         }
-
         return customer;
     }
 
     async update(ma_kh: string, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
         const customer = await this.findOne(ma_kh);
-
         Object.assign(customer, updateCustomerDto);
         return await this.customerRepository.save(customer);
     }

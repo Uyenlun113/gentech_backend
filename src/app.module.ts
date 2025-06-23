@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
+import { AccountDirectoryModule } from './account-directory/account-directory.module';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { CategoryCustomerModule } from './category-customer/category-customer.mo
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       extra: {
-        server: 'localhost\\SQLEXPRESS',
+        server: 'localhost\\MSSQLSERVER01',
         options: {
           encrypt: false,
           trustServerCertificate: true,
@@ -25,7 +26,8 @@ import { CategoryCustomerModule } from './category-customer/category-customer.mo
       logging: true,
     }),
     AuthModule,
-    CategoryCustomerModule
+    CategoryCustomerModule,
+    AccountDirectoryModule
   ],
 })
 export class AppModule { }

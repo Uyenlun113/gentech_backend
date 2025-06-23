@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { CategoryCustomerModule } from './category-customer/category-customer.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AuthModule } from './auth/auth.module';
       synchronize: false,
       logging: true,
     }),
-    AuthModule, 
+    AuthModule,
+    CategoryCustomerModule
   ],
 })
 export class AppModule { }

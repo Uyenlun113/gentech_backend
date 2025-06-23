@@ -29,7 +29,6 @@ export class AuthService {
     }
 
     async login(loginDto: LoginDto) {
-        console.log('Login attempt:', loginDto);
         const user = await this.validateUser(loginDto.user_name, loginDto.password);
         if (!user) {
             throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không đúng');
@@ -60,6 +59,9 @@ export class AuthService {
             password: hashedPassword,
         });
         return this.userRepository.save(newUser);
+    }
+    async findUserById(user_id: number): Promise<User | null> {
+        return this.userRepository.findOne({ where: { user_id } });
     }
 
 }

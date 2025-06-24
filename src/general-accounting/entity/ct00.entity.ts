@@ -1,24 +1,25 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('ct00')
 export class Ct00Entity {
-    @PrimaryColumn({ name: 'id', type: 'numeric', precision: 18, scale: 0 })
+    @PrimaryGeneratedColumn({ type: 'int' })
     id: number;
 
-    @Column({ name: 'ma_dvcs', type: 'varchar', length: 255 })
+    @Column({ name: 'stt_rec', type: 'char', length: 11 })
+    stt_rec: string;
+
+    @Column({ name: 'ma_dvcs', type: 'char', length: 8 })
     ma_dvcs: string;
 
-    @Column({ name: 'ma_ct', type: 'varchar', length: 255 })
+    @Column({ name: 'ma_ct', type: 'char', length: 3 })
     ma_ct: string;
 
-    @Column({ name: 'ma_gd', type: 'varchar', length: 255, nullable: true })
+    @Column({ name: 'ma_gd', type: 'char', length: 1, nullable: true })
     ma_gd: string;
 
-    @Column({ name: 'ma_kh', type: 'varchar', length: 255, nullable: true })
-    ma_kh: string;
+    @Column({ name: 'ma_kh', type: 'char', length: 16, nullable: true })
+    ma_kh: string | null;
 
-    @Column({ name: 'ngay_ct', type: 'smalldatetime', nullable: true })
+    @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;
-
-
 }

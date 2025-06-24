@@ -100,6 +100,22 @@ export class GeneralAccountingService {
         };
     }
     async findAllCt11(stt_rec: string) {
-        return this.ct11Repo.find({ where: { stt_rec } });
+        const rawData = await this.ct11Repo
+            .createQueryBuilder('ct11')
+            .where('ct11.stt_rec = :stt_rec', { stt_rec })
+            .getRawMany();
+
+        const data = rawData.map((row) => ({
+            stt_rec0: row.ct11_stt_rec0,
+            stt_rec: row.ct11_stt_rec,
+            tk_i: row.ct11_tk_i,
+            ps_no: row.ct11_ps_no,
+            ps_co: row.ct11_ps_co,
+            nh_dk: row.ct11_nh_dk,
+            dien_giaii: row.ct11_dien_giaii,
+            ngay_ct: row.ct11_ngay_ct,
+      }));
+        return data;
     }
+
 }

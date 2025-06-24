@@ -2,9 +2,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ct11')
 export class Ct11Entity {
-    @PrimaryColumn({ name: 'stt_rec', type: 'char', length: 11 })
+    @PrimaryColumn({ name: 'stt_rec0', type: 'char', length: 11 })
+    stt_rec0: string;
+    @Column({ name: 'stt_rec', type: 'char', length: 11 })
     stt_rec: string;
-
     @Column({ name: 'tk_i', type: 'char', length: 16 })
     tk_i: string;
 

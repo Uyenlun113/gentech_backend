@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
+import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 
 @Module({
@@ -30,7 +30,6 @@ import { GeneralAccountingModule } from './general-accounting/general-accounting
     CategoryCustomerModule,
     AccountDirectoryModule,
     GeneralAccountingModule
-
   ],
 })
 export class AppModule { }

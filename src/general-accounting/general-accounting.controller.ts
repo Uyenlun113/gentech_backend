@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { GeneralAccountingService } from './general-accounting.service';
 import { SaveGeneralAccountingDto } from './save-general-accounting.dto';
 
@@ -38,5 +38,20 @@ export class GeneralAccountingController {
             message: 'Danh sách chi tiết',
             data,
         };
+    }
+
+    @Get('find-one/:stt_rec')
+    async findOne(@Param('stt_rec') stt_rec: string) {
+        return this.generalAccountingService.findOne(stt_rec);
+    }
+
+    @Put('update/:stt_rec')
+    async update(@Param('stt_rec') stt_rec: string, @Body() body: SaveGeneralAccountingDto) {
+        return this.generalAccountingService.update(stt_rec, body);
+    }
+
+    @Delete('delete/:stt_rec')
+    async delete(@Param('stt_rec') stt_rec: string) {
+        return this.generalAccountingService.delete(stt_rec);
     }
 }

@@ -26,7 +26,7 @@ export class GeneralAccountingController {
         return {
             status: 200,
             message: 'Danh sách phiếu',
-            ...data, // total, items
+            ...data, 
         };
     }
 

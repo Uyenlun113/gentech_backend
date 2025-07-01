@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsNumber, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class QueryCustomerDto {
     @IsOptional()

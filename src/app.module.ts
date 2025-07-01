@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
-import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 
 @Module({
@@ -15,7 +15,7 @@ import { GeneralAccountingModule } from './general-accounting/general-accounting
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       extra: {
-        server: 'localhost\\SQLEXPRESS',
+        server: 'localhost\\MSSQLSERVER01',
         options: {
           encrypt: false,
           trustServerCertificate: true,

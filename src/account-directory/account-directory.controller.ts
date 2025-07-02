@@ -4,6 +4,7 @@ import {
     Delete,
     Get,
     Param,
+    Patch,
     Post,
     Put,
     Query,
@@ -39,7 +40,7 @@ export class AccountDirectoryController {
     }
 
     // Cập nhật tài khoản
-    @Put(':tk')
+    @Patch(':tk')
     async update(
         @Param('tk') tk: string,
         @Body() updateAccountDto: UpdateAccountDto
@@ -51,6 +52,12 @@ export class AccountDirectoryController {
     @Delete(':tk')
     async remove(@Param('tk') tk: string) {
         return this.accountDirectoryService.remove(tk);
+    }
+
+    // Lấy danh sách tài khoản theo nhóm
+    @Get('group/list')
+    async findAllAcountGroup(@Query() query: QueryAccountDto) {
+        return this.accountDirectoryService.findAllAcountGroup(query);
     }
 
 }

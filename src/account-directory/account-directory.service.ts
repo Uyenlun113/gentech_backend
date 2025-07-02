@@ -1,22 +1,25 @@
 import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { AccountDirectory } from './account-directory.entity';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { QueryAccountDto } from './dto/query-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { AccountDirectory } from './entity/account-directory.entity';
+import { AccountGroup } from './entity/account-group.entity';
 
 @Injectable()
 export class AccountDirectoryService {
     constructor(
         @InjectRepository(AccountDirectory)
         private accountDirectoryRepository: Repository<AccountDirectory>,
+        @InjectRepository(AccountGroup)
+        private readonly accountGroupRepository: Repository<AccountGroup>,
         private dataSource: DataSource
     ) { }
 
     // Danh sách tài khoản
     async findAll(queryDto: QueryAccountDto) {
-        const { page = 1, limit = 10, search, loai_tk, tk_me } = queryDto;
+        const { page = 1, limit = 10, search, nh_tk, tk_me } = queryDto;
         try {
             const queryBuilder = this.accountDirectoryRepository.createQueryBuilder('dmtk');
             if (search) {
@@ -25,18 +28,17 @@ export class AccountDirectoryService {
                     { search: `%${search}%` }
                 );
             }
-            if (loai_tk) {
+            if (nh_tk) {
                 if (search) {
-                    queryBuilder.andWhere('dmtk.loai_tk = :loai_tk', { loai_tk });
+                    queryBuilder.andWhere('dmtk.nh_tk = :nh_tk', { nh_tk });
                 } else {
-                    queryBuilder.where('dmtk.loai_tk = :loai_tk', { loai_tk });
+                    queryBuilder.where('dmtk.nh_tk = :nh_tk', { nh_tk });
                 }
             }
             if (tk_me) {
                 queryBuilder.andWhere('dmtk.tk_me = :tk_me', { tk_me });
             }
             const [data, total] = await queryBuilder
-                .orderBy('dmtk.tk', 'ASC')
                 .skip((page - 1) * limit)
                 .take(limit)
                 .getManyAndCount();
@@ -74,7 +76,7 @@ export class AccountDirectoryService {
                 ten_tk: dto.ten_tk,
                 tk_me: dto.tk_me,
                 ma_nt: dto.ma_nt,
-                loai_tk: dto.loai_tk,
+                nh_tk: dto.nh_tk,
             });
             const savedAccount = await this.accountDirectoryRepository.save(account);
             return {
@@ -151,6 +153,38 @@ export class AccountDirectoryService {
                 throw error;
             }
             throw new BadRequestException(`Lỗi khi tìm tài khoản: ${error.message}`);
+        }
+    }
+
+    async findAllAcountGroup(queryDto: QueryAccountDto) {
+        const { page = 1, limit = 10, search } = queryDto;
+
+        try {
+            const queryBuilder = this.accountGroupRepository.createQueryBuilder('nhomtk');
+            if (search) {
+                queryBuilder.where(
+                    '(nhomtk.ma_nh LIKE :search OR nhomtk.ten_nh LIKE :search)',
+                    { search: `%${search}%` }
+                );
+            }
+            const [data, total] = await queryBuilder
+                .orderBy('nhomtk.ma_nh', 'ASC')
+                .skip((page - 1) * limit)
+                .take(limit)
+                .getManyAndCount();
+            return {
+                status: HttpStatus.OK,
+                message: 'Danh sách nhóm tài khoản',
+                data,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(total / limit),
+                },
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi khi lấy danh sách nhóm tài khoản: ${error.message}`);
         }
     }
 }

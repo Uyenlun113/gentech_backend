@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountDirectoryController } from "./account-directory.controller";
-import { AccountDirectory } from "./account-directory.entity";
 import { AccountDirectoryService } from "./account-directory.service";
+import { AccountDirectory } from "./entity/account-directory.entity";
+import { AccountGroup } from './entity/account-group.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([AccountDirectory])],
+    imports: [TypeOrmModule.forFeature([AccountDirectory, AccountGroup])],
     controllers: [AccountDirectoryController],
     providers: [AccountDirectoryService],
     exports: [AccountDirectoryService],

@@ -14,5 +14,5 @@ export class CreateAccountDto {
     ma_nt?: string;
 
     @IsOptional()
-    loai_tk?: string;
+    nh_tk?: string;
 }

@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsNumber, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class QueryAccountDto {
     @IsOptional()
@@ -20,10 +20,14 @@ export class QueryAccountDto {
 
     @IsOptional()
     @IsString({ message: 'Loại tài khoản phải là chuỗi' })
-    loai_tk?: string;
+    nh_tk?: string;
+
 
     @IsOptional()
     @IsString({ message: 'Tài khoản mẹ phải là chuỗi' })
     tk_me?: string;
+
+    @IsOptional()
+    ma_nh?: string;
 }
 

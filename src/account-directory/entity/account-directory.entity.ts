@@ -14,6 +14,6 @@ export class AccountDirectory {
     @Column({ name: 'ma_nt', type: 'varchar', length: 255, nullable: true })
     ma_nt: string;
 
-    @Column({ name: 'loai_tk', type: 'varchar', length: 255, nullable: true })
-    loai_tk: string;
+    @Column({ name: 'nh_tk0', type: 'varchar', length: 255, nullable: true })
+    nh_tk: string;
 }

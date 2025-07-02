@@ -15,7 +15,7 @@ import { GeneralAccountingModule } from './general-accounting/general-accounting
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       extra: {
-        server: 'localhost\\MSSQLSERVER01',
+        server: 'localhost\\SQLEXPRESS',
         options: {
           encrypt: false,
           trustServerCertificate: true,

@@ -195,18 +195,14 @@ export class MaterialService {
                 .orderBy("CAST(SUBSTRING(material.ma_vt, 3, LEN(material.ma_vt)) AS INT)", "DESC")
                 .limit(1)
                 .getOne();
-
             if (!latestMaterial) {
                 return 'VT001';
             }
-
             const latestNumber = parseInt(latestMaterial.ma_vt.substring(2));
             if (isNaN(latestNumber)) {
                 return 'VT001';
             }
-
             return 'VT' + (latestNumber + 1).toString().padStart(3, '0');
-
         } catch (error) {
             return 'VT001';
         }
@@ -229,6 +225,4 @@ export class MaterialService {
             throw new BadRequestException(`Lỗi khi tìm vật tư theo part number: ${error.message}`);
         }
     }
-
-
 }

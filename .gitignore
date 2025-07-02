@@ -54,3 +54,8 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# App specific (a cho app.module.ts vào vì trên mac cần thay đổi chút.
+# nao được cấp máy thì bỏ app.module.ts trong này)
+src/app.module.ts 
+package-lock.json

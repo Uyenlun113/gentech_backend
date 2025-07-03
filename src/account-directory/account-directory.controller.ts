@@ -28,9 +28,9 @@ export class AccountDirectoryController {
     }
 
     // Lấy chi tiết tài khoản
-    @Get(':tk')
-    async findOne(@Param('tk') tk: string) {
-        return this.accountDirectoryService.findOne(tk);
+    @Get(':tk0')
+    async findOne(@Param('tk0') tk0: string) {
+        return this.accountDirectoryService.findOne(tk0);
     }
 
     // Thêm mới tài khoản
@@ -40,18 +40,18 @@ export class AccountDirectoryController {
     }
 
     // Cập nhật tài khoản
-    @Patch(':tk')
+    @Patch(':tk0')
     async update(
-        @Param('tk') tk: string,
+        @Param('tk0') tk0: string,
         @Body() updateAccountDto: UpdateAccountDto
     ) {
-        return this.accountDirectoryService.update(tk, updateAccountDto);
+        return this.accountDirectoryService.update(tk0, updateAccountDto);
     }
 
     // Xóa tài khoản
-    @Delete(':tk')
-    async remove(@Param('tk') tk: string) {
-        return this.accountDirectoryService.remove(tk);
+    @Delete(':tk0')
+    async remove(@Param('tk0') tk0: string) {
+        return this.accountDirectoryService.remove(tk0);
     }
 
     // Lấy danh sách tài khoản theo nhóm

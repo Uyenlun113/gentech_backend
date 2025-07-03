@@ -5,6 +5,9 @@ export class AccountDirectory {
     @PrimaryColumn({ name: 'tk', type: 'varchar', length: 16 })
     tk: string;
 
+    @Column({ name: 'tk0', type: 'char', length: 16 })
+    tk0: string;
+    
     @Column({ name: 'ten_tk', type: 'nvarchar', length: 255 })
     ten_tk: string;
 

@@ -12,7 +12,7 @@ export class QueryAccountDto {
     @Type(() => Number)
     @IsNumber({}, { message: 'Limit phải là số' })
     @Min(1, { message: 'Limit phải lớn hơn 0' })
-    limit?: number = 10;
+    limit?: number = 500;
 
     @IsOptional()
     @IsString({ message: 'Search phải là chuỗi' })

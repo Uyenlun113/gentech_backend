@@ -19,7 +19,7 @@ export class AccountDirectoryService {
 
     // Danh sách tài khoản
     async findAll(queryDto: QueryAccountDto) {
-        const { page = 1, limit = 10, search, nh_tk, tk_me } = queryDto;
+        const { page = 1, limit = 500, search, nh_tk, tk_me } = queryDto;
         try {
             const queryBuilder = this.accountDirectoryRepository.createQueryBuilder('dmtk');
             if (search) {
@@ -62,23 +62,34 @@ export class AccountDirectoryService {
     async create(dto: CreateAccountDto) {
         try {
             const existingAccount = await this.accountDirectoryRepository.findOne({
-                where: { tk: dto.tk }
+                where: { tk: dto.tk0 }
             });
             if (existingAccount) {
                 throw new BadRequestException('Mã tài khoản đã tồn tại');
             }
+
+            // Gọi CheckTKContain thay vì CheckStringContainDM
             await this.dataSource.query(
-                `EXEC CheckStringContainDM @table_name = @0, @table_key = @1, @new_value = @2, @old_value = @3`,
-                ['dmtk', 'tk', dto.tk, '']
-            );
+                `
+                DECLARE @table_name CHAR(5) = @0, 
+                        @new_value CHAR(5) = @1, 
+                        @tk_me CHAR(8000) = @2, 
+                        @old_value CHAR(8000) = @3;
+                EXEC dbo.CheckTKContain @table_name, @new_value, @tk_me, @old_value;
+                `,
+                ['dmtk', dto.tk0, dto.tk_me || '', '']
+              );
+
             const account = this.accountDirectoryRepository.create({
-                tk: dto.tk,
+                tk: dto.tk0,
+                tk0: dto.tk0,
                 ten_tk: dto.ten_tk,
                 tk_me: dto.tk_me,
                 ma_nt: dto.ma_nt,
                 nh_tk: dto.nh_tk,
             });
             const savedAccount = await this.accountDirectoryRepository.save(account);
+
             return {
                 status: HttpStatus.CREATED,
                 message: 'Thêm tài khoản thành công',
@@ -93,15 +104,15 @@ export class AccountDirectoryService {
     }
 
     // Cập nhật tài khoản
-    async update(tk: string, dto: UpdateAccountDto) {
+    async update(tk0: string, dto: UpdateAccountDto) {
         try {
-            const existingAccount = await this.findOne(tk);
-            await this.dataSource.query(
-                `EXEC CheckStringContainDM @table_name = @0, @table_key = @1, @new_value = @2, @old_value = @3`,
-                ['dmtk', 'tk', tk, tk]
-            );
+            const existingAccount = await this.findOne(tk0);
             Object.assign(existingAccount, dto);
             const updatedAccount = await this.accountDirectoryRepository.save(existingAccount);
+            await this.dataSource.query(
+                `EXEC UpdateBacTk @0`,
+                [updatedAccount.tk0]
+            );
             return {
                 status: HttpStatus.OK,
                 message: 'Cập nhật tài khoản thành công',
@@ -113,13 +124,14 @@ export class AccountDirectoryService {
         }
     }
 
+
     // Xóa tài khoản
-    async remove(tk: string) {
+    async remove(tk0: string) {
         try {
-            const account = await this.findOne(tk);
+            const account = await this.findOne(tk0);
             const checkResult = await this.dataSource.query(
                 `EXEC CheckDeleteListId @ma_dm = @0, @value = @1`,
-                ['dmtk', tk]
+                ['dmtk', tk0]
             );
             if (checkResult && checkResult[0] && checkResult[0][''] === 0) {
                 throw new BadRequestException('Không thể xóa tài khoản này vì đang được sử dụng trong các chứng từ khác');
@@ -128,7 +140,7 @@ export class AccountDirectoryService {
             return {
                 status: HttpStatus.OK,
                 message: 'Xóa tài khoản thành công',
-                tk
+                tk0
             };
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof BadRequestException) {
@@ -139,13 +151,13 @@ export class AccountDirectoryService {
     }
 
     // Lấy thông tin chi tiết tài khoản theo mã
-    async findOne(tk: string): Promise<AccountDirectory> {
+    async findOne(tk0: string): Promise<AccountDirectory> {
         try {
             const account = await this.accountDirectoryRepository.findOne({
-                where: { tk }
+                where: { tk0 }
             });
             if (!account) {
-                throw new NotFoundException(`Không tìm thấy tài khoản với mã: ${tk}`);
+                throw new NotFoundException(`Không tìm thấy tài khoản với mã: ${tk0}`);
             }
             return account;
         } catch (error) {

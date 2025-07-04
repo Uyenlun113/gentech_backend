@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { MaterialService } from './material.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreateMaterialDto } from './dto/create-material.dto';
-import { UpdateMaterialDto } from './dto/update-material.dto';
 import { QueryMaterialDto } from './dto/query-material.dto';
+import { UpdateMaterialDto } from './dto/update-material.dto';
+import { MaterialService } from './material.service';
 
 @Controller('materials')
 export class MaterialController {
@@ -10,17 +10,13 @@ export class MaterialController {
 
     @Post()
     create(@Body() createMaterialDto: CreateMaterialDto) {
+        console.log(createMaterialDto);
         return this.materialService.create(createMaterialDto);
     }
 
     @Get()
     findAll(@Query() query: QueryMaterialDto) {
         return this.materialService.findAll(query);
-    }
-
-    @Get('by-part-no/:part_no')
-    findByPartNo(@Param('part_no') part_no: string) {
-        return this.materialService.findByPartNo(part_no);
     }
 
     @Get(':ma_vt')

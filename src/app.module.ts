@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
+import { MaterialModule } from './material/material.module';
+
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       extra: {
-        // server: 'localhost\\SQLEXPRESS',
+        server: 'localhost',
         options: {
           encrypt: false,
           trustServerCertificate: true,
@@ -34,6 +36,8 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     AccountDirectoryModule,
     GeneralAccountingModule,
     CashReceiptModule
+    MaterialModule
+
   ],
 })
 export class AppModule { }

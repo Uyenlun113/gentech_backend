@@ -1,44 +1,68 @@
+import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+
 export class CreateMaterialDto {
+    @IsString({ message: 'Tên vật tư phải là chuỗi' })
     ten_vt: string;
-    part_no?: string;
-    ten_vt2?: string;
+
+    @IsOptional()
     dvt?: string;
-    dvt1?: string;
-    he_so1?: number;
+
+    @IsOptional()
+    @Type(() => Number)
     vt_ton_kho?: number;
-    gia_von?: number;
+
+    @IsOptional()
     tk_vt?: string;
+
+    @IsOptional()
     tk_gv?: string;
+
+    @IsOptional()
     tk_dt?: string;
+
+    @IsOptional()
     tk_tl?: string;
+
+    @IsOptional()
     tk_spdd?: string;
+
+    @IsOptional()
     nh_vt1?: string;
-    nh_vt2?: string;
-    nh_vt3?: string;
+
+    @IsOptional()
+    @Type(() => Number)
     sl_min?: number;
+
+    @IsOptional()
+    @Type(() => Number)
     sl_max?: number;
+
+    @IsOptional()
     status?: string;
+
+    @IsOptional()
+    @Type(() => Number)
     sua_tk_vt?: number;
+
+    @IsOptional()
     tk_cl_vt?: string;
+
+    @IsOptional()
     tk_dtnb?: string;
+
+    @IsOptional()
     ghi_chu?: string;
-    ma_td1?: string;
-    ma_td2?: string;
-    ma_td3?: string;
-    ngay_td3?: Date;
-    sl_td1?: number;
-    sl_td2?: number;
-    sl_td3?: number;
-    gc_td1?: string;
-    gc_td2?: string;
-    gc_td3?: string;
-    ma_khond?: string;
-    ma_khon2?: string;
-    thuend?: number;
-    thue_nknd?: number;
+
+    @IsOptional()
     loai_vt?: string;
-    ma_tra_cuu?: string;
+
+    @IsOptional()
     tk_nvl?: string;
+
+    @IsOptional()
     tk_ck?: string;
+
+    @IsOptional()
     tk_km?: string;
 }

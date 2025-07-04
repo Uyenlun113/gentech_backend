@@ -1,8 +1,30 @@
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
+
 export class QueryMaterialDto {
-    page?: number = 1;
-    limit?: number = 10;
+    @IsOptional()
+    @IsString()
     search?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    page?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    limit?: number;
+
+    @IsOptional()
+    @IsString()
     status?: string;
+
+    @IsOptional()
+    @IsString()
     loai_vt?: string;
-    vt_ton_kho?: number;
+
+    @IsOptional()
+    @IsString()
+    vt_ton_kho?: string;
 }

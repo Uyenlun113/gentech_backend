@@ -64,50 +64,7 @@ export class MaterialService {
                 ['dmvt', 'ma_vt', ma_vt, '']
             );
             const material = this.materialRepository.create({
-                ma_vt,
-                ten_vt: dto.ten_vt,
-                part_no: dto.part_no,
-                ten_vt2: dto.ten_vt2,
-                dvt: dto.dvt,
-                dvt1: dto.dvt1,
-                he_so1: dto.he_so1,
-                vt_ton_kho: dto.vt_ton_kho || 1,
-                gia_von: dto.gia_von || 0,
-                tk_vt: dto.tk_vt,
-                tk_gv: dto.tk_gv,
-                tk_dt: dto.tk_dt,
-                tk_tl: dto.tk_tl,
-                tk_spdd: dto.tk_spdd,
-                nh_vt1: dto.nh_vt1,
-                nh_vt2: dto.nh_vt2,
-                nh_vt3: dto.nh_vt3,
-                sl_min: dto.sl_min || 0,
-                sl_max: dto.sl_max || 0,
-                status: dto.status || 'A',
-                sua_tk_vt: dto.sua_tk_vt || 0,
-                tk_cl_vt: dto.tk_cl_vt,
-                tk_dtnb: dto.tk_dtnb,
-                ghi_chu: dto.ghi_chu,
-                ma_td1: dto.ma_td1,
-                ma_td2: dto.ma_td2,
-                ma_td3: dto.ma_td3,
-                ngay_td3: dto.ngay_td3,
-                sl_td1: dto.sl_td1,
-                sl_td2: dto.sl_td2,
-                sl_td3: dto.sl_td3,
-                gc_td1: dto.gc_td1,
-                gc_td2: dto.gc_td2,
-                gc_td3: dto.gc_td3,
-                ma_khond: dto.ma_khond,
-                ma_khon2: dto.ma_khon2,
-                thuend: dto.thuend,
-                thue_nknd: dto.thue_nknd,
-                loai_vt: dto.loai_vt,
-                ma_tra_cuu: dto.ma_tra_cuu,
-                tk_nvl: dto.tk_nvl,
-                tk_ck: dto.tk_ck,
-                tk_km: dto.tk_km,
-                date: new Date(),
+                ...dto, ma_vt, date: new Date(),
                 time: new Date().toTimeString().substring(0, 8),
             });
             const savedMaterial = await this.materialRepository.save(material);
@@ -132,8 +89,6 @@ export class MaterialService {
                 ['dmvt', 'ma_vt', ma_vt, ma_vt]
             );
             Object.assign(existingMaterial, dto);
-            existingMaterial.date0 = new Date();
-            existingMaterial.time0 = new Date().toTimeString().substring(0, 8);
             const updatedMaterial = await this.materialRepository.save(existingMaterial);
             return {
                 message: 'Cập nhật vật tư thành công',
@@ -208,21 +163,4 @@ export class MaterialService {
         }
     }
 
-    // Thêm method tìm kiếm theo barcode/part_no
-    async findByPartNo(part_no: string): Promise<Material> {
-        try {
-            const material = await this.materialRepository.findOne({
-                where: { part_no }
-            });
-            if (!material) {
-                throw new NotFoundException(`Không tìm thấy vật tư với part number: ${part_no}`);
-            }
-            return material;
-        } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error;
-            }
-            throw new BadRequestException(`Lỗi khi tìm vật tư theo part number: ${error.message}`);
-        }
-    }
 }

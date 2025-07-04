@@ -5,13 +5,17 @@ import { AccountDirectoryModule } from './account-directory/account-directory.mo
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
+import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { MaterialModule } from './material/material.module';
+
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mssql',
+      host: 'localhost',
+      port: Number(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -31,7 +35,9 @@ import { MaterialModule } from './material/material.module';
     CategoryCustomerModule,
     AccountDirectoryModule,
     GeneralAccountingModule,
+    CashReceiptModule
     MaterialModule
+
   ],
 })
 export class AppModule { }

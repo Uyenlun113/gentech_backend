@@ -2,10 +2,10 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('ct41') // tên bảng trong database
 export class Ct41 {
-  @PrimaryColumn()
+  @Column()
   stt_rec: string;
 
-  @Column()
+  @PrimaryColumn()
   stt_rec0: string;
 
   @Column()

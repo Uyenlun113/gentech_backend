@@ -44,4 +44,7 @@ export class Customer {
     @Column({ name: "nh_kh3", type: "varchar", length: 50, nullable: true })
     nh_kh3: string
 
+    @Column({ name: "doi_tac", type: "nvarchar", length: 32, nullable: true })
+    doi_tac: string
+
 }

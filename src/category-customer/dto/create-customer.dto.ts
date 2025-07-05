@@ -61,4 +61,8 @@ export class CreateCustomerDto {
     @IsString()
     @IsOptional()
     nh_kh3?: string;
+
+    @IsString()
+    @IsOptional()
+    doi_tac?: string;
 }

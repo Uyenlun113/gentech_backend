@@ -73,7 +73,8 @@ export class CategoryCustomerService {
                 status: dto.status || 'A',
                 nh_kh1: dto.nh_kh1,
                 nh_kh2: dto.nh_kh2,
-                nh_kh3: dto.nh_kh3
+                nh_kh3: dto.nh_kh3,
+                doi_tac: dto.doi_tac
             });
             const savedCustomer = await this.customerRepository.save(customer);
             return {

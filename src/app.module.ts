@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
+import { DmkhoModule } from './dmkho/dmkho.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { MaterialModule } from './material/material.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
@@ -36,7 +37,8 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     AccountDirectoryModule,
     GeneralAccountingModule,
     CashReceiptModule,
-    MaterialModule
+    MaterialModule,
+    DmkhoModule
 
   ],
 })

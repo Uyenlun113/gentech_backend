@@ -19,7 +19,4 @@ export class QueryDmkhoDto {
     @IsOptional()
     @IsString()
     status?: string;
-
-
-
 }

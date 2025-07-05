@@ -35,6 +35,12 @@ export class Material {
     @Column({ name: 'nh_vt1', type: 'varchar', length: 16, nullable: true })
     nh_vt1: string;
 
+    @Column({ name: 'nh_vt2', type: 'varchar', length: 16, nullable: true })
+    nh_vt2: string;
+
+    @Column({ name: 'nh_vt3', type: 'varchar', length: 16, nullable: true })
+    nh_vt3: string;
+
     @Column({ name: 'sl_min', type: 'numeric', precision: 13, scale: 3, nullable: true })
     sl_min: number;
 

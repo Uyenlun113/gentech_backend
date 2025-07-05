@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, MaxLength, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateCustomerDto {
     @IsString()
@@ -49,4 +49,16 @@ export class CreateCustomerDto {
     @IsString()
     @IsOptional()
     status?: string;
+
+    @IsString()
+    @IsOptional()
+    nh_kh1?: string;
+
+    @IsString()
+    @IsOptional()
+    nh_kh2?: string;
+
+    @IsString()
+    @IsOptional()
+    nh_kh3?: string;
 }

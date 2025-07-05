@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { dmnhvtService } from "./dmnhvt.service";
 import { CreateDmnhvtDto } from "./dto/create-dmnhvt.dto";
+import { QueryMaterialDto } from "./dto/query-material.dto";
 
 @Controller('dmnhvt')
 export class dmnhvtController {
@@ -12,8 +13,8 @@ export class dmnhvtController {
     }
 
     @Get()
-    async findAll() {
-        return await this.dmnhvtService.findAll();
+    async findAll(@Query() queryMaterialDto: QueryMaterialDto) {
+        return await this.dmnhvtService.findAll(queryMaterialDto);
     }
 
     @Get(':loai_nh/:ma_nh')

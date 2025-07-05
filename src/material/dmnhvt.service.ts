@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { Dmnhvt } from "./dmnhvt.entity";
 import { CreateDmnhvtDto } from "./dto/create-dmnhvt.dto";
+import { QueryMaterialDto } from "./dto/query-material.dto";
 
 @Injectable()
 export class dmnhvtService {
@@ -24,12 +25,30 @@ export class dmnhvtService {
         }
     }
 
-    async findAll() {
+    async findAll(queryMaterialDto: QueryMaterialDto) {
         try {
-            const res = await this.dmnhvtRepository.find({});
+            const { page = 1, limit = 10, search } = queryMaterialDto;
+            const queryBuilder = this.dmnhvtRepository.createQueryBuilder('dmnhvt');
+            if (search) {
+                queryBuilder.where(
+                    '(dmnhvt.ma_nh LIKE :search OR dmnhvt.ten_nh LIKE :search)',
+                    { search: `%${search}%` }
+                );
+            }
+            const [res, total] = await queryBuilder
+                .orderBy('dmnhvt.ma_nh', 'ASC')
+                .skip((page - 1) * limit)
+                .take(limit)
+                .getManyAndCount();
             return {
                 message: 'Lấy danh sách nhóm vật tư thành công',
-                data: res
+                data: res,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(total / limit),
+                },
             };
         } catch (error) {
             throw new BadRequestException(`Lỗi khi lấy danh sách nhóm vật tư: ${error.message}`);

@@ -70,7 +70,10 @@ export class CategoryCustomerService {
                 tk_nh: dto.tk_nh,
                 ten_nh: dto.ten_nh,
                 ghi_chu: dto.ghi_chu,
-                status: dto.status || 'A'
+                status: dto.status || 'A',
+                nh_kh1: dto.nh_kh1,
+                nh_kh2: dto.nh_kh2,
+                nh_kh3: dto.nh_kh3
             });
             const savedCustomer = await this.customerRepository.save(customer);
             return {

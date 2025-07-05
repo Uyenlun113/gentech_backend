@@ -31,6 +31,12 @@ export class CreateMaterialDto {
     nh_vt1?: string;
 
     @IsOptional()
+    nh_vt2?: string;
+
+    @IsOptional()
+    nh_vt3?: string;
+
+    @IsOptional()
     @Type(() => Number)
     sl_min?: number;
 

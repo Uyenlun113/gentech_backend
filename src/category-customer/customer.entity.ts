@@ -35,4 +35,13 @@ export class Customer {
     @Column({ name: 'status', type: 'varchar', length: 20, default: '1' })
     status: string;
 
+    @Column({ name: "nh_kh1", type: "varchar", length: 50, nullable: true })
+    nh_kh1: string
+
+    @Column({ name: "nh_kh2", type: "varchar", length: 50, nullable: true })
+    nh_kh2: string
+
+    @Column({ name: "nh_kh3", type: "varchar", length: 50, nullable: true })
+    nh_kh3: string
+
 }

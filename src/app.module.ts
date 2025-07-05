@@ -35,7 +35,7 @@ import { MaterialModule } from './material/material.module';
     CategoryCustomerModule,
     AccountDirectoryModule,
     GeneralAccountingModule,
-    CashReceiptModule
+    CashReceiptModule,
     MaterialModule
 
   ],

@@ -61,7 +61,7 @@ export class DmkhoService {
     async create(createDmkhoDto: CreateDmkhoDto) {
         try {
             const newData = this.dmkhoRepository.create(createDmkhoDto);
-            const res = this.dmkhoRepository.save(newData);
+            const res = await this.dmkhoRepository.save(newData);
             return {
                 message: 'Thêm danh mục kho thành công',
                 data: res
@@ -81,7 +81,7 @@ export class DmkhoService {
                 throw new BadRequestException(`Không tìm thấy bản ghi với ma_kho=${ma_kho}`);
             }
 
-            const newMaKho = updateDmkhoDto.ma_kho;
+            const newMaKho = updateDmkhoDto.ma_kho || ma_kho;
 
             // Gọi stored procedure CheckStringContainDM với sp_executesql
             await queryRunner.query(
@@ -110,7 +110,10 @@ export class DmkhoService {
             );
 
             // Cập nhật
-            const result = await this.dmkhoRepository.update({ ma_kho }, updateDmkhoDto);
+            const result = await this.dmkhoRepository.update({ ma_kho }, {
+                ...updateDmkhoDto,
+                ma_kho: newMaKho
+            });
             if (result.affected === 0) {
                 throw new BadRequestException(`Không tìm thấy bản ghi với ma_kho=${ma_kho}`);
             }

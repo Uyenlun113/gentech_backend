@@ -5,6 +5,7 @@ import { AccountDirectoryModule } from './account-directory/account-directory.mo
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { DmkhoModule } from './dmkho/dmkho.module';
+import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { MaterialModule } from './material/material.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
@@ -35,7 +36,8 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     GeneralAccountingModule,
     CashReceiptModule,
     MaterialModule,
-    DmkhoModule
+    DmkhoModule,
+    DmvuviecModule
 
   ],
 })

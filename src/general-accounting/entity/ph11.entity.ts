@@ -2,11 +2,14 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ph11')
 export class Ph11Entity {
-    @PrimaryColumn({ name: 'ma_ct', type: 'char', length: 3 })
-    ma_ct: string;
-
     @PrimaryColumn({ name: 'stt_rec', type: 'char', length: 11 })
     stt_rec: string;
+
+    @Column({ name: 'ma_ct', type: 'char', length: 3 })
+    so_ct: string;
+
+    @Column({ name: 'ma_qs', type: 'char', length: 11 })
+    ma_qs: string;
 
     @Column({ name: 'ngay_lct', type: 'smalldatetime', nullable: true })
     ngay_lct: Date;
@@ -19,4 +22,10 @@ export class Ph11Entity {
 
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;
+
+    @Column({ name: 'ma_dvcs', type: 'char', length: 8 })
+    ma_dvcs: string;
+
+    @Column({ name: 'status', type: 'char', length: 8 })
+    status: string;
 }

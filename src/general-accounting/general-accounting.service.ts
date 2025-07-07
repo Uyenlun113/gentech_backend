@@ -31,7 +31,7 @@ export class GeneralAccountingService {
         const stt_rec = `APK${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_gd = '1';
-        const ma_ct = phieu.ma_ct;
+        const ma_ct = phieu.so_ct;
         const ngay_ct = new Date(phieu.ngay_lct);
 
         // Step 2: Lưu PH11 (phiếu)
@@ -135,13 +135,12 @@ export class GeneralAccountingService {
             throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
         }
 
-        const ma_ct = phieu.ma_ct;
+        const ma_ct = phieu.so_ct;
         const ngay_ct = new Date(phieu.ngay_lct);
 
         // Cập nhật Ph11
         await this.ph11Repo.update({ stt_rec }, {
             ...phieu,
-            ma_ct,
             ngay_ct,
         });
 

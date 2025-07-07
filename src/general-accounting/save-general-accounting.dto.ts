@@ -2,13 +2,15 @@ import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
 
 class PhieuDto {
-    @IsNotEmpty() ma_ct: string;
+    @IsNotEmpty() so_ct: string;
+    @IsNotEmpty() ma_qs: string;
     @IsNotEmpty() ngay_lct: string;
     @IsOptional() ps_no?: number;
     @IsOptional() ps_co?: number;
     @IsOptional() nh_dk?: string;
     @IsOptional() dien_giai?: string;
     @IsOptional() ty_giaf?: number;
+    @IsOptional() status?: string;
 }
 
 class HachToanDto {
@@ -26,6 +28,9 @@ class HachToanDto {
 
     @IsOptional()
     dien_giaii?: string;
+
+    @IsOptional()
+    ma_kh?: string;
 }
 
 class HopDongThueDto {

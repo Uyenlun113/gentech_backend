@@ -1,23 +1,31 @@
 import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
 
-export class CreateDmkhoDto {
+export class CreateDmvuviecDto {
     @IsNotEmpty()
     @IsString()
-    ma_kho: string;
+    ma_vv: string;
 
     @IsNotEmpty()
     @IsString()
-    ten_kho: string;
+    ten_vv: string;
 
     @IsOptional()
     @IsString()
-    ma_dvcs: string;
+    ma_kh: string;
 
     @IsOptional()
     @IsString()
-    tk_dl: string;
+    ma_bpkd: string;
 
     @IsOptional()
     @IsString()
-    status: string;
+    ma_bpth: string;
+
+    @IsOptional()
+    @IsNumber()
+    tien_nt0: number;
+
+    @IsOptional()
+    @IsNumber()
+    thue_nt: number;
 }

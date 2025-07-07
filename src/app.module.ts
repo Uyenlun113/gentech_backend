@@ -15,7 +15,7 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: process.env.DB_SERVER, //
+      host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,

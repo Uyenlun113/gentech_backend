@@ -15,18 +15,15 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: 'localhost',
+      host: process.env.DB_SERVER, //
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      extra: {
-        server: 'localhost',
-        options: {
-          encrypt: false,
-          trustServerCertificate: true,
-          enableArithAbort: true,
-        },
+      options: {
+        encrypt: false,
+        trustServerCertificate: true,
+        enableArithAbort: true,
       },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,

@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Ct00Entity } from './entity/ct00.entity';
 import { Ct11Entity } from './entity/ct11.entity';
 import { Ct11GtEntity } from './entity/ct11gt.entity';
@@ -21,6 +21,8 @@ export class GeneralAccountingService {
 
         @InjectRepository(Ct00Entity)
         private readonly ct00Repo: Repository<Ct00Entity>,
+
+        private readonly dataSource: DataSource
     ) { }
 
     async save(dto: SaveGeneralAccountingDto) {
@@ -32,17 +34,22 @@ export class GeneralAccountingService {
         const ma_ct = phieu.ma_ct;
         const ngay_ct = new Date(phieu.ngay_lct);
 
+        // Step 2: Lưu PH11 (phiếu)
         await this.ph11Repo.save({
             ...phieu,
-            ma_ct,
             stt_rec,
             ngay_ct,
         });
 
-        const validHachToan = (Array.isArray(hachToan) ? hachToan : []).filter(ht =>
-            Object.values(ht).some(val => val !== null && val !== '')
-        );
+        // Step 3: Lưu CT11 (hạch toán)
+        const validHachToan = Array.isArray(hachToan)
+            ? hachToan.filter(ht => Object.values(ht).some(val => val !== null && val !== ''))
+            : [];
+
         if (validHachToan.length > 0) {
+            // Xóa dữ liệu cũ nếu có (để giống log)
+            await this.ct11Repo.delete({ stt_rec });
+
             await this.ct11Repo.save(
                 validHachToan.map(ht => ({
                     ...ht,
@@ -52,29 +59,72 @@ export class GeneralAccountingService {
             );
         }
 
-        const validHopDongThue = (Array.isArray(hopDongThue) ? hopDongThue : []).filter(gt =>
-            Object.values(gt).some(val => val !== null && val !== '')
-        );
-        if (validHopDongThue.length > 0) {
+        // Step 4: Lưu CT11GT (hóa đơn thuế GTGT)
+        const validGT = Array.isArray(hopDongThue)
+            ? hopDongThue.filter(gt => Object.values(gt).some(val => val !== null && val !== ''))
+            : [];
+
+        if (validGT.length > 0) {
+            await this.ct11gtRepo.delete({ stt_rec });
+
             await this.ct11gtRepo.save(
-                validHopDongThue.map(gt => ({
+                validGT.map(gt => ({
                     ...gt,
                     stt_rec,
                 }))
             );
+
+            // Step 5: CheckExistsHDVao nếu có GTGT
+            const hd = validGT[0];
+            try {
+                await this.dataSource.query(
+                    `EXEC CheckExistsHDVao @stt_rec = @0, @so_ct0 = @1, @so_seri0 = @2, @ngay_ct0 = @3, @ma_so_thue = @4`,
+                    [
+                        stt_rec,
+                        hd.so_seri0 || '',
+                    ]
+                );
+            } catch (error) {
+                console.error('Lỗi CheckExistsHDVao:', error);
+                throw new BadRequestException('Hóa đơn GTGT đã tồn tại hoặc không hợp lệ');
+            }
         }
 
+        // Step 6: Lưu CT00
         await this.ct00Repo.save({
             ma_ct,
             ma_dvcs,
             ma_gd,
             stt_rec,
-            ma_kh: validHopDongThue[0]?.ma_kh?.trim() || null,
             ngay_ct,
+            ma_kh: validGT[0]?.ma_kh?.trim() || null,
         });
 
-        return { message: 'Lưu thành công', stt_rec };
+        // Step 7: CheckData
+        try {
+            await this.dataSource.query(
+                `EXEC [dbo].[GLCTPK1-CheckData] @status = @0, @stt_rec = @1`,
+                ['2', stt_rec]
+            );
+        } catch (error) {
+            console.error('Lỗi CheckData:', error);
+            throw new BadRequestException('Dữ liệu không hợp lệ khi kiểm tra trước ghi sổ');
+        }
+
+        // Step 8: Post
+        try {
+            await this.dataSource.query(
+                `EXEC [dbo].[GLCTPK1-Post] @stt_rec = @0, @ma_ct = @1`,
+                [stt_rec, ma_ct]
+            );
+        } catch (error) {
+            console.error('Lỗi ghi sổ:', error);
+            throw new BadRequestException('Ghi sổ thất bại');
+        }
+
+        return { message: 'Lưu và ghi sổ thành công', stt_rec };
     }
+
 
     async update(stt_rec: string, dto: SaveGeneralAccountingDto) {
         const { phieu, hachToan, hopDongThue } = dto;

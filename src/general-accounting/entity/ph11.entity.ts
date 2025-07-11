@@ -5,11 +5,14 @@ export class Ph11Entity {
     @PrimaryColumn({ name: 'stt_rec', type: 'char', length: 11 })
     stt_rec: string;
 
-    @Column({ name: 'ma_ct', type: 'char', length: 3 })
+    @Column({ name: 'so_ct', type: 'char', length: 3 })
     so_ct: string;
 
-    @Column({ name: 'ma_qs', type: 'char', length: 11 })
+    @Column({ name: 'ma_qs', type: 'varchar', length: 11 })
     ma_qs: string;
+
+    @Column({ name: 'ma_ct', type: 'varchar', length: 11, nullable: true })
+    ma_ct: string;
 
     @Column({ name: 'ngay_lct', type: 'smalldatetime', nullable: true })
     ngay_lct: Date;

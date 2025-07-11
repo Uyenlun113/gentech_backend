@@ -27,7 +27,6 @@ export class GeneralAccountingService {
 
     async save(dto: SaveGeneralAccountingDto) {
         const { phieu, hachToan, hopDongThue } = dto;
-
         const stt_rec = `APK${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_gd = '1';
@@ -39,6 +38,8 @@ export class GeneralAccountingService {
             ...phieu,
             stt_rec,
             ngay_ct,
+            ma_ct: phieu.so_ct,
+            status: "1"
         });
 
         // Step 3: Lưu CT11 (hạch toán)
@@ -81,7 +82,10 @@ export class GeneralAccountingService {
                     `EXEC CheckExistsHDVao @stt_rec = @0, @so_ct0 = @1, @so_seri0 = @2, @ngay_ct0 = @3, @ma_so_thue = @4`,
                     [
                         stt_rec,
+                        phieu.so_ct || '',
                         hd.so_seri0 || '',
+                        phieu.ngay_lct || '',
+                        hd.ma_so_thue || '',
                     ]
                 );
             } catch (error) {
@@ -127,64 +131,112 @@ export class GeneralAccountingService {
 
 
     async update(stt_rec: string, dto: SaveGeneralAccountingDto) {
-        const { phieu, hachToan, hopDongThue } = dto;
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        // Kiểm tra xem record có tồn tại không
-        const existingPh11 = await this.ph11Repo.findOne({ where: { stt_rec } });
-        if (!existingPh11) {
-            throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
-        }
+        try {
+            const { phieu, hachToan, hopDongThue } = dto;
+            const existingPh11 = await queryRunner.manager.findOne(this.ph11Repo.target, { where: { stt_rec } });
 
-        const ma_ct = phieu.so_ct;
-        const ngay_ct = new Date(phieu.ngay_lct);
+            if (!existingPh11) throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
 
-        // Cập nhật Ph11
-        await this.ph11Repo.update({ stt_rec }, {
-            ...phieu,
-            ngay_ct,
-        });
+            const ma_ct = phieu.so_ct?.trim();
+            const ngay_ct = new Date(phieu.ngay_lct);
 
-        // Xóa tất cả Ct11 cũ và tạo mới
-        await this.ct11Repo.delete({ stt_rec });
-        const validHachToan = (Array.isArray(hachToan) ? hachToan : []).filter(ht =>
-            Object.values(ht).some(val => val !== null && val !== '')
-        );
-        if (validHachToan.length > 0) {
-            await this.ct11Repo.save(
-                validHachToan.map(ht => ({
-                    ...ht,
-                    stt_rec,
-                    ngay_ct,
-                }))
+            // Cập nhật PH11
+            await queryRunner.manager.update(this.ph11Repo.target, { stt_rec }, {
+                ...phieu,
+                ngay_ct,
+            });
+
+            // Xóa CT11 cũ
+            await queryRunner.query(
+                `DELETE FROM CT11 WHERE stt_rec = '${stt_rec}'`
             );
-        }
 
-        // Xóa tất cả Ct11Gt cũ và tạo mới
-        await this.ct11gtRepo.delete({ stt_rec });
-        const validHopDongThue = (Array.isArray(hopDongThue) ? hopDongThue : []).filter(gt =>
-            Object.values(gt).some(val => val !== null && val !== '')
-        );
-        if (validHopDongThue.length > 0) {
-            await this.ct11gtRepo.save(
-                validHopDongThue.map(gt => ({
-                    ...gt,
-                    stt_rec,
-                }) as Ct11GtEntity)
+            // Thêm CT11 mới
+            const validHachToan = (Array.isArray(hachToan) ? hachToan : []).filter(ht =>
+                Object.values(ht).some(val => val !== null && val !== '')
             );
+            if (validHachToan.length > 0) {
+                await queryRunner.manager.save(this.ct11Repo.target,
+                    validHachToan.map(ht => ({
+                        ...ht,
+                        stt_rec,
+                        ngay_ct,
+                    }))
+                );
+            }
+
+            // Xóa CT11GT cũ
+            await queryRunner.query(
+                `DELETE FROM CT11GT WHERE stt_rec = '${stt_rec}'`
+            );
+
+            // Thêm CT11GT mới
+            const validHopDongThue = (Array.isArray(hopDongThue) ? hopDongThue : []).filter(gt =>
+                Object.values(gt).some(val => val !== null && val !== '')
+            );
+            if (validHopDongThue.length > 0) {
+                await queryRunner.manager.save(this.ct11gtRepo.target,
+                    validHopDongThue.map(gt => ({
+                        ...gt,
+                        stt_rec,
+                    }))
+                );
+            }
+
+            // Cập nhật CT00
+            await queryRunner.manager.update(this.ct00Repo.target, { stt_rec }, {
+                ma_ct,
+                ma_kh: validHopDongThue[0]?.ma_kh?.trim() || null,
+                ngay_ct,
+            });
+            await queryRunner.commitTransaction();
+            await this.dataSource.query(
+                `EXEC [dbo].[GLCTPK1-Checkdata] @status = '2', @stt_rec = '${stt_rec}'`
+            );
+            await this.dataSource.query(
+                `EXEC [dbo].[GLCTPK1-Post] @stt_rec = '${stt_rec}', @ma_ct = '${ma_ct}'`
+            );
+            return { message: 'Cập nhật thành công', stt_rec };
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
         }
-
-        // Cập nhật Ct00
-        await this.ct00Repo.update({ stt_rec }, {
-            ma_ct,
-            ma_kh: validHopDongThue[0]?.ma_kh?.trim() || null,
-            ngay_ct,
-        });
-
-        return { message: 'Cập nhật thành công', stt_rec };
     }
 
+
     async delete(stt_rec: string) {
-        // Kiểm tra xem record có tồn tại không
+        // const existingPh11 = await this.ph11Repo.findOne({ where: { stt_rec } });
+        // if (!existingPh11) {
+        //     throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
+        // }
+        // const ma_ct = existingPh11.so_ct.trim();
+        // await this.dataSource.query(`EXEC [dbo].[InPostcttt20] @stt_rec = @0`, [stt_rec]);
+        // await this.dataSource.query(`
+        //     exec sp_executesql 
+        //       N'exec [dbo].[CheckEditVouchertt] @stt_rec, @tablename', 
+        //       N'@stt_rec char(11), @tablename varchar(20)', 
+        //       @stt_rec = @0, 
+        //       @tablename = @1
+        //   `, [stt_rec, 'cttt20']);
+        // await this.dataSource.query(`EXEC [dbo].[InPostcttt30] @stt_rec = @0`, [stt_rec]);
+        // await this.dataSource.query(`
+        //     exec sp_executesql 
+        //       N'exec [dbo].[CheckEditVouchertt] @stt_rec, @tablename', 
+        //       N'@stt_rec char(11), @tablename varchar(20)', 
+        //       @stt_rec = @0, 
+        //       @tablename = @1
+        //   `, [stt_rec, 'cttt30']);
+        // await this.dataSource.query(`SELECT count(1) FROM dmct WHERE ma_ct like @0 AND ngay_ks = @1`, [ma_ct, new Date()]);
+        // await this.dataSource.query(`EXEC DeleteVoucher @cMa_ct = @0, @stt_rec = @1`, [ma_ct, stt_rec]);
+
+        // return { message: 'Xóa thành công theo quy trình chuẩn', stt_rec };
+
         const existingPh11 = await this.ph11Repo.findOne({ where: { stt_rec } });
         if (!existingPh11) {
             throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
@@ -199,29 +251,50 @@ export class GeneralAccountingService {
         return { message: 'Xóa thành công', stt_rec };
     }
 
+
     async findOne(stt_rec: string) {
         const ph11 = await this.ph11Repo.findOne({ where: { stt_rec } });
         if (!ph11) {
             throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
         }
 
-        const ct11 = await this.ct11Repo.find({ where: { stt_rec } });
+        const ct11 = await this.ct11Repo
+            .createQueryBuilder('ct11')
+            .where('ct11.stt_rec = :stt_rec', { stt_rec })
+            .getRawMany();
         const ct11gt = await this.ct11gtRepo.find({ where: { stt_rec } });
 
         return {
             phieu: ph11,
             hachToan: ct11.map(item => ({
-                tk_i: item.tk_i,
-                ps_no: item.ps_no,
-                ps_co: item.ps_co,
-                nh_dk: item.nh_dk,
-                dien_giaii: item.dien_giaii,
+                tk_i: item.ct11_tk_i,
+                ps_no: item.ct11_ps_no,
+                ps_co: item.ct11_ps_co,
+                nh_dk: item.ct11_nh_dk,
+                dien_giaii: item.ct11_dien_giaii,
+                ngay_ct: item.ct11_ngay_item,
+                ma_kh_i: item.ct11_ma_kh_i,
             })),
             hopDongThue: ct11gt.map(item => ({
                 so_seri0: item.so_seri0,
+                so_ct0: item.so_ct0,
+                ngay_ct0: item.ngay_ct0,
                 ma_kh: item.ma_kh,
                 ten_kh: item.ten_kh,
-            })),
+                dia_chi: item.dia_chi,
+                ma_so_thue: item.ma_so_thue,
+                ty_gia: item.ty_gia,
+                ten_vt: item.ten_vt,
+                t_tien: item.t_tien,
+                thue_suat: item.thue_suat,
+                t_thue: item.t_thue,
+                t_tt: item.t_tt,
+                tk_thue_no: item.tk_thue_no,
+                tk_du: item.tk_du,
+                ma_thue: item.ma_thue,
+                ma_ms: item.ma_ms,
+                kh_mau_hd: item.kh_mau_hd,
+            }))
         };
     }
 
@@ -250,10 +323,13 @@ export class GeneralAccountingService {
         };
     }
 
-    async findAllCt11(stt_rec: string) {
+    async findAllCt11(stt_rec_input: string | string[]) {
+        const stt_rec_list = Array.isArray(stt_rec_input)
+            ? stt_rec_input.map((x) => x.trim())
+            : stt_rec_input.split(',').map((x) => x.trim());
         const rawData = await this.ct11Repo
             .createQueryBuilder('ct11')
-            .where('ct11.stt_rec = :stt_rec', { stt_rec })
+            .where('RTRIM(ct11.stt_rec) IN (:...stt_rec_list)', { stt_rec_list })
             .getRawMany();
 
         const data = rawData.map((row) => ({
@@ -266,6 +342,8 @@ export class GeneralAccountingService {
             dien_giaii: row.ct11_dien_giaii,
             ngay_ct: row.ct11_ngay_ct,
         }));
+
         return data;
     }
+
 }

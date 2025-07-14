@@ -168,7 +168,7 @@ export class CashReceiptService {
         pagination: { page: number; limit: number; total: number; totalPages: number };
     }> {
         const page = Number(query.page) || 1;
-        const limit = Number(query.limit) || 10;
+        const limit = Number(query.limit) || 5;
 
         try {
             const queryBuilder = this.ph41Repository.createQueryBuilder('ph41');
@@ -182,7 +182,7 @@ export class CashReceiptService {
             }
 
             const [ph41Records, total] = await queryBuilder
-                .orderBy('ph41.ngay_ct', 'DESC')
+                .orderBy('ph41.stt_rec', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit)
                 .getManyAndCount();

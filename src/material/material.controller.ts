@@ -10,7 +10,6 @@ export class MaterialController {
 
     @Post()
     create(@Body() createMaterialDto: CreateMaterialDto) {
-        console.log(createMaterialDto);
         return this.materialService.create(createMaterialDto);
     }
 

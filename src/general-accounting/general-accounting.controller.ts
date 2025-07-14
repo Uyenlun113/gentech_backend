@@ -8,6 +8,7 @@ export class GeneralAccountingController {
 
     @Post()
     async save(@Body() body: SaveGeneralAccountingDto) {
+        console.log(body);
         return this.generalAccountingService.save(body);
     }
 
@@ -26,7 +27,7 @@ export class GeneralAccountingController {
         return {
             status: 200,
             message: 'Danh sách phiếu',
-            ...data, 
+            ...data,
         };
     }
 

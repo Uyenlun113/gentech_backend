@@ -12,9 +12,7 @@ async function bootstrap() {
     disableErrorMessages: false,
   }));
 
-  app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:3000', ' https://f423-222-252-30-194.ngrok-free.app'],
-  }); // ✅ bật CORS
+  app.enableCors(); // ✅ bật CORS
 
   app.listen(5000, '0.0.0.0')
   console.log(`🚀 Application is running on: http://localhost:${process.env.PORT || 3000}`);

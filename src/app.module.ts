@@ -8,6 +8,7 @@ import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { MaterialModule } from './material/material.module';
+import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 
 
@@ -37,8 +38,8 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     CashReceiptModule,
     MaterialModule,
     DmkhoModule,
-    DmvuviecModule
-
+    DmvuviecModule,
+    Ct46AccountingModule
   ],
 })
 export class AppModule { }

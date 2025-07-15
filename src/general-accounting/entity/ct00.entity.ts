@@ -22,4 +22,6 @@ export class Ct00Entity {
 
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;
+
+    
 }

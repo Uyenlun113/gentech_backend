@@ -6,7 +6,7 @@ export class Ct11Entity {
     stt_rec: string;
 
     @PrimaryColumn({ name: 'stt_rec0', type: 'char', length: 11 })
-    stt_rec0: string; // KHÔNG được nullable nếu dùng làm PrimaryColumn
+    stt_rec0: string;
 
     @Column({ name: 'tk_i', type: 'char', length: 16 })
     tk_i: string;

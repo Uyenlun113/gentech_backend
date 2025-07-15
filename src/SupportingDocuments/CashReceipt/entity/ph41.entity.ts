@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('ph41') // tên bảng trong database
+@Entity('ph41')
 export class Ph41 {
   @PrimaryColumn()
   stt_rec: string;

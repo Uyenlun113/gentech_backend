@@ -12,15 +12,15 @@ import { Type } from 'class-transformer';
 export class CashReceiptItemDto {
   @IsString()
   @IsNotEmpty()
-  tk_so: string;
+  tk_i: string;
 
   @IsString()
   @IsNotEmpty()
   tk_me: string;
 
-  @IsString()
-  @IsNotEmpty()
-  ten_tai_khoan: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // ten_tai_khoan: string;
 
   @IsNumber()
   ps_co: number;
@@ -92,4 +92,8 @@ export class CreateCashReceiptDto {
 
   @IsNumber()
   han_thanh_toan: string;
+  
+  @IsString()
+  @IsNotEmpty()
+  tk: string;
 }

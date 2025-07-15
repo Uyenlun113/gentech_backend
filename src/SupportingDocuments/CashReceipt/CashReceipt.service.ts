@@ -45,7 +45,7 @@ export class CashReceiptService {
                 ty_gia: createDto.ty_gia ?? 1,
                 ma_dvcs: 'CTY',
                 ma_ct: 'PT1',
-                tk: '1111',
+                tk: createDto.tk,
                 t_thue_nt: 0,
                 t_tien_nt: createDto.tong_tien ?? 0,
                 t_thue: 0,
@@ -82,7 +82,7 @@ export class CashReceiptService {
                         ngay_ct: createDto.ngay_ct,
                         so_ct: createDto.so_ct ?? '',
                         dien_giaii: item.dien_giai ?? '', // lấy dien_giai từ từng item
-                        tk_i: item.tk_so ?? '111', // lấy tk_i từ item hoặc default
+                        tk_i: item.tk_i ?? '111', // lấy tk_i từ item hoặc default
                         tien_nt: item.ps_co ?? 0,
                         tien: item.ps_co ?? 0,
                         thue: 0.0,
@@ -130,7 +130,7 @@ export class CashReceiptService {
                             ma_kh: createDto.ma_kh ?? '',
                             ma_qs: createDto.ma_qs ?? '',
                             nh_dk: "A01",
-                            tk: item.tk_so,
+                            tk: item.tk_i,
                             tk_du: item.tk_me,
                             ps_no_nt: 0,
                             ps_co_nt: 0,
@@ -168,7 +168,7 @@ export class CashReceiptService {
         pagination: { page: number; limit: number; total: number; totalPages: number };
     }> {
         const page = Number(query.page) || 1;
-        const limit = Number(query.limit) || 10;
+        const limit = Number(query.limit) || 5;
 
         try {
             const queryBuilder = this.ph41Repository.createQueryBuilder('ph41');
@@ -182,7 +182,7 @@ export class CashReceiptService {
             }
 
             const [ph41Records, total] = await queryBuilder
-                .orderBy('ph41.ngay_ct', 'DESC')
+                .orderBy('ph41.stt_rec', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit)
                 .getManyAndCount();
@@ -222,6 +222,7 @@ export class CashReceiptService {
                         tai_khoan_list,
                         tong_tien,
                         han_thanh_toan: 0, // nếu có, hoặc lấy từ ph41 nếu lưu ở đó
+                        tk: ph.tk,
                     };
                 })
             );
@@ -288,7 +289,7 @@ export class CashReceiptService {
                         ngay_ct: updateDto.ngay_ct,
                         so_ct: updateDto.so_ct ?? '',
                         dien_giaii: item.dien_giai ?? '',
-                        tk_i: item.tk_so ?? '111',
+                        tk_i: item.tk_i ?? '111',
                         tien_nt: item.ps_co ?? 0,
                         tien: item.ps_co ?? 0,
                         thue: 0.0,
@@ -332,7 +333,7 @@ export class CashReceiptService {
                             ma_kh: updateDto.ma_kh ?? '',
                             ma_qs: updateDto.ma_qs ?? '',
                             nh_dk: 'A01',
-                            tk: item.tk_so,
+                            tk: item.tk_i,
                             tk_du: item.tk_me,
                             ps_no_nt: 0,
                             ps_co_nt: 0,

@@ -14,6 +14,9 @@ export class Ct46Entity {
     @Column({ type: 'date' })
     ngay_ct: Date;
 
+    @Column({ type: 'varchar' })
+    loai_hd: string;
+
     @PrimaryColumn({ name: 'so_ct0', type: 'char', length: 12 })
     so_ct0: string;
 

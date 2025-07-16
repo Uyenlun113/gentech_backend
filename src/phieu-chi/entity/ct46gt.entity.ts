@@ -5,6 +5,9 @@ export class Ct46gtEntity {
     @PrimaryColumn({ name: 'stt_rec', type: 'char', length: 11 })
     stt_rec: string;
 
+    @Column({ name: 'ngay_ct', type: 'date' })
+    ngay_ct: Date;
+
     @PrimaryColumn({ name: 'ma_ct', type: 'char', length: 3 })
     ma_ct: string;
 
@@ -13,24 +16,6 @@ export class Ct46gtEntity {
 
     @Column({ name: 'tk_thue_no', type: 'char', length: 16 })
     tk_thue_no: string;
-
-    @Column({ name: 'tien', type: 'numeric', precision: 16, scale: 2, nullable: true })
-    tien: number;
-
-    @Column({ name: 'thue_suat', type: 'numeric', precision: 6, scale: 2, nullable: true })
-    thue_suat: number;
-
-    @Column({ name: 'thue', type: 'numeric', precision: 16, scale: 2, nullable: true })
-    thue: number;
-
-    @Column({ name: 'tt', type: 'numeric', precision: 16, scale: 2, nullable: true })
-    tt: number;
-
-    @Column({ name: 'tk_thue_i', type: 'char', length: 16, nullable: true })
-    tk_thue_i: string;
-
-    @Column({ name: 'loai_hd', type: 'char', length: 8, nullable: true })
-    loai_hd: string;
 
     @Column({ name: 'ma_ms', type: 'char', length: 8, nullable: true })
     ma_ms: string;
@@ -53,22 +38,24 @@ export class Ct46gtEntity {
     @Column({ name: 'ma_so_thue', type: 'nvarchar', length: 128, nullable: true })
     ma_so_thue: string;
 
-    @Column({ name: 'ten_vt', type: 'nvarchar', length: 128, nullable: true })
+    @Column({ name: 'ten_vt', type: 'nvarchar', length: 254, nullable: true })
     ten_vt: string;
 
-    @Column({ name: 'ma_thue', type: 'nvarchar', length: 128, nullable: true })
+    @Column({ name: 'ma_thue', type: 'char', length: 16, nullable: true })
     ma_thue: string;
 
-    @Column({ name: 'ghi_chu', type: 'nvarchar', length: 128, nullable: true })
+    @Column({ name: 'ghi_chu', type: 'nvarchar', length: 4000, nullable: true })
     ghi_chu: string;
 
-    @Column({ name: 't_thue', type: 'nvarchar', length: 128, nullable: true })
-    t_thue: string;
+    @Column({ name: 't_thue', type: 'numeric', precision: 16, scale: 2, nullable: true })
+    t_thue: number;
 
-    @Column({ name: 't_tien', type: 'nvarchar', length: 128, nullable: true })
-    t_tien: string;
+    @Column({ name: 't_tien', type: 'numeric', precision: 16, scale: 2, nullable: true })
+    t_tien: number;
 
-    @Column({ name: 't_tt', type: 'nvarchar', length: 128, nullable: true })
-    t_tt: string;
+    @Column({ name: 't_tt', type: 'numeric', precision: 16, scale: 2, nullable: true })
+    t_tt: number;
 
+    @Column({ name: 'thue_suat', type: 'numeric', precision: 16, scale: 2, nullable: true })
+    thue_suat: number;
 }

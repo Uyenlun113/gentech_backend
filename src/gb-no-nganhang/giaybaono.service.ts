@@ -1,37 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Ct41 } from './entity/ct41.entity';
-import { Ph41 } from './entity/ph41.entity';
+import { Ct51 } from './entity/ct51.entity';
+import { Ph51 } from './entity/ph51.entity';
 import { Ct00 } from './entity/ct00.entity';
-import { CreateCashReceiptDto } from './dto/create-cash-receipt.dto';
-import { UpdateCashReceiptDto } from './dto/update-cash-receipt.dto';
-import { QueryCashReceiptDto } from './dto/query-cash-receipt.dto';
+import { CreateGiayBaoCoDto } from './dto/create-giaybaono.dto';
+import { UpdateGiayBaoCoDto } from './dto/update-giaybaono.dto';
+import { QueryGiayBaoCoDto } from './dto/query-giaybaono.dto';
 
 @Injectable()
-export class CashReceiptService {
+export class GiayBaoCoService {
     constructor(
-        @InjectRepository(Ct41)
-        private readonly cashReceiptRepository: Repository<Ct41>,
-        @InjectRepository(Ph41)
-        private readonly ph41Repository: Repository<Ph41>,
+        @InjectRepository(Ct51)
+        private readonly GiayBaoCoRepository: Repository<Ct51>,
+        @InjectRepository(Ph51)
+        private readonly ph51Repository: Repository<Ph51>,
         @InjectRepository(Ct00)
         private readonly ct00Repository: Repository<Ct00>,
         private readonly dataSource: DataSource
     ) { }
 
     /**
-     * Tạo mới bản ghi ở ph41, ct41, ct00 theo dữ liệu từ DTO
+     * Tạo mới bản ghi ở ph51, ct51, ct00 theo dữ liệu từ DTO
      */
-    async create(createDto: CreateCashReceiptDto): Promise<{ ct41: Ct41[]; ph41: Ph41; ct00: Ct00[] }> {
+    async create(createDto: CreateGiayBaoCoDto): Promise<{ ct51: Ct51[]; ph51: Ph51; ct00: Ct00[] }> {
         // 1. Sinh mã stt_rec
         const stt_rec = await this.generateUniqueSttRec();
-        let ph41Saved: Ph41 | null = null;
-        let ct41Saved: Ct41[] = [];
+        let ph51Saved: Ph51 | null = null;
+        let ct51Saved: Ct51[] = [];
         let ct00Saved: Ct00[] = [];
         try {
-            // 1. Tạo ph41 trước
-            const ph41 = this.ph41Repository.create({
+            // 1. Tạo ph51 trước
+            const ph51 = this.ph51Repository.create({
                 stt_rec: stt_rec,
                 ma_gd: createDto.ma_gd ?? '',
                 ma_kh: createDto.ma_kh ?? '2',
@@ -45,7 +45,7 @@ export class CashReceiptService {
                 ma_nt: createDto.ma_nt ?? '',
                 ty_gia: createDto.ty_gia ?? 1,
                 ma_dvcs: 'CTY',
-                ma_ct: 'PT1',
+                ma_ct: 'BC1',
                 tk: createDto.tk,
                 t_thue_nt: 0,
                 t_tien_nt: createDto.tong_tien ?? 0,
@@ -65,21 +65,21 @@ export class CashReceiptService {
                 hd_thue: "0",
                 sysflag: 'P',
             });
-            await this.ph41Repository.insert(ph41);
-            ph41Saved = ph41
+            await this.ph51Repository.insert(ph51);
+            ph51Saved = ph51
         } catch (error) {
-            throw new Error('Create ph41 failed: ' + error.message);
+            throw new Error('Create ph51 failed: ' + error.message);
         }
 
         try {
-            // 2. Tạo ct41 cho từng tài khoản trong array
-            ct41Saved = [];
+            // 2. Tạo ct51 cho từng tài khoản trong array
+            ct51Saved = [];
             if (Array.isArray(createDto.tai_khoan_list) && createDto.tai_khoan_list.length > 0) {
                 for (let i = 0; i < createDto.tai_khoan_list.length; i++) {
                     const item = createDto.tai_khoan_list[i];
-                    const ct41 = this.cashReceiptRepository.create({
+                    const ct51 = this.GiayBaoCoRepository.create({
                         stt_rec: stt_rec,
-                        ma_ct: 'PT1',
+                        ma_ct: 'BC1',
                         ngay_ct: createDto.ngay_ct,
                         so_ct: createDto.so_ct ?? '',
                         dien_giaii: item.dien_giai ?? '', // lấy dien_giai từ từng item
@@ -93,15 +93,15 @@ export class CashReceiptService {
                         so_ct0: '',
                         ty_giahtf2: 0,
                     });
-                    this.cashReceiptRepository.insert(ct41);
-                    const saved = ct41
-                    ct41Saved.push(saved);
+                    this.GiayBaoCoRepository.insert(ct51);
+                    const saved = ct51
+                    ct51Saved.push(saved);
                 }
             }
         } catch (error) {
-            // Nếu lỗi khi tạo ct41 thì xóa ph41
-            if (ph41Saved) await this.ph41Repository.delete({ stt_rec });
-            throw new Error('Create ct41 failed: ' + error.message);
+            // Nếu lỗi khi tạo ct51 thì xóa ph51
+            if (ph51Saved) await this.ph51Repository.delete({ stt_rec });
+            throw new Error('Create ct51 failed: ' + error.message);
         }
 
         try {
@@ -119,7 +119,7 @@ export class CashReceiptService {
                         const ct00 = this.ct00Repository.create({
                             stt_rec: stt_rec,
                             stt_rec0: rec.stt_rec0,
-                            ma_ct: 'PT1',
+                            ma_ct: 'BC1',
                             ma_gd: createDto.ma_gd ?? '',
                             ngay_ct: createDto.ngay_ct,
                             ngay_lct: createDto.ngay_lct,
@@ -155,18 +155,18 @@ export class CashReceiptService {
                 }
             }
         } catch (error) {
-            // Nếu lỗi khi tạo ct00 thì xóa ct41 và ph41
-            if (ct41Saved) await this.cashReceiptRepository.delete({ stt_rec });
-            if (ph41Saved) await this.ph41Repository.delete({ stt_rec });
+            // Nếu lỗi khi tạo ct00 thì xóa ct51 và ph51
+            if (ct51Saved) await this.GiayBaoCoRepository.delete({ stt_rec });
+            if (ph51Saved) await this.ph51Repository.delete({ stt_rec });
             throw new Error('Create ct00 failed: ' + error.message);
         }
         await this.dataSource.query(
-            `EXEC [dbo].[CACTPT1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'PT1'`
+            `EXEC [dbo].[CACTPT1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'BC1'`
         );
-        return { ct41: ct41Saved, ph41: ph41Saved, ct00: ct00Saved };
+        return { ct51: ct51Saved, ph51: ph51Saved, ct00: ct00Saved };
     }
 
-    async findAll(query: QueryCashReceiptDto): Promise<{
+    async findAll(query: QueryGiayBaoCoDto): Promise<{
         data: any[];
         pagination: { page: number; limit: number; total: number; totalPages: number };
     }> {
@@ -174,28 +174,28 @@ export class CashReceiptService {
         const limit = Number(query.limit) || 5;
 
         try {
-            const queryBuilder = this.ph41Repository.createQueryBuilder('ph41');
+            const queryBuilder = this.ph51Repository.createQueryBuilder('ph51');
 
             if (query.search) {
                 const searchTerm = `%${query.search}%`;
                 queryBuilder.andWhere(
-                    '(ph41.ong_ba LIKE :search OR ph41.ma_gd LIKE :search OR ph41.so_ct LIKE :search)',
+                    '(ph51.ong_ba LIKE :search OR ph51.ma_gd LIKE :search OR ph51.so_ct LIKE :search)',
                     { search: searchTerm }
                 );
             }
 
-            const [ph41Records, total] = await queryBuilder
-                .orderBy('ph41.stt_rec', 'DESC')
+            const [ph51Records, total] = await queryBuilder
+                .orderBy('ph51.stt_rec', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit)
                 .getManyAndCount();
 
-            // Build full records with ct41 and ct00
+            // Build full records with ct51 and ct00
             const fullData = await Promise.all(
-                ph41Records.map(async (ph) => {
-                    const ct41List = await this.cashReceiptRepository.find({ where: { stt_rec: ph.stt_rec } });
+                ph51Records.map(async (ph) => {
+                    const ct51List = await this.GiayBaoCoRepository.find({ where: { stt_rec: ph.stt_rec } });
 
-                    const tai_khoan_list = ct41List.map((item) => ({
+                    const tai_khoan_list = ct51List.map((item) => ({
                         tk_so: item.tk_i,
                         tk_me: item.tk_i?.substring(0, 3) ?? '',
                         ten_tai_khoan: '', // Nếu có mapping thì xử lý, hoặc dùng enum từ DB
@@ -224,7 +224,7 @@ export class CashReceiptService {
                         loai_ct: ph.loai_ct,
                         tai_khoan_list,
                         tong_tien,
-                        han_thanh_toan: 0, // nếu có, hoặc lấy từ ph41 nếu lưu ở đó
+                        han_thanh_toan: 0, // nếu có, hoặc lấy từ ph51 nếu lưu ở đó
                         tk: ph.tk,
                     };
                 })
@@ -240,28 +240,28 @@ export class CashReceiptService {
                 },
             };
         } catch (error) {
-            throw new Error('FindAll CashReceipt failed: ' + error.message);
+            throw new Error('FindAll GiayBaoCo failed: ' + error.message);
         }
     }
 
-    async findOne(stt_rec: string): Promise<Ct41 | null> {
+    async findOne(stt_rec: string): Promise<Ct51 | null> {
         try {
-            return await this.cashReceiptRepository.findOneBy({ stt_rec });
+            return await this.GiayBaoCoRepository.findOneBy({ stt_rec });
         } catch (error) {
-            throw new Error('FindOne CashReceipt failed: ' + error.message);
+            throw new Error('FindOne GiayBaoCo failed: ' + error.message);
         }
     }
 
     /**
-     * Cập nhật đồng thời ct41, ph41, ct00 theo dữ liệu từ DTO
+     * Cập nhật đồng thời ct51, ph51, ct00 theo dữ liệu từ DTO
      */
     async update(
         stt_rec: string,
-        updateDto: UpdateCashReceiptDto
-    ): Promise<{ ct41: Ct41[]; ph41: Ph41 | null; ct00: Ct00[] }> {
+        updateDto: UpdateGiayBaoCoDto
+    ): Promise<{ ct51: Ct51[]; ph51: Ph51 | null; ct00: Ct00[] }> {
         try {
-            // 1. Cập nhật ph41
-            await this.ph41Repository.update({ stt_rec }, {
+            // 1. Cập nhật ph51
+            await this.ph51Repository.update({ stt_rec }, {
                 ma_gd: updateDto.ma_gd,
                 ma_kh: updateDto.ma_kh,
                 dia_chi: updateDto.dia_chi,
@@ -276,19 +276,19 @@ export class CashReceiptService {
                 loai_ct: updateDto.loai_ct,
             });
 
-            const ph41 = await this.ph41Repository.findOne({ where: { stt_rec } });
+            const ph51 = await this.ph51Repository.findOne({ where: { stt_rec } });
 
-            // 2. Xóa và tạo lại ct41
-            await this.cashReceiptRepository.delete({ stt_rec });
+            // 2. Xóa và tạo lại ct51
+            await this.GiayBaoCoRepository.delete({ stt_rec });
 
-            const ct41Saved: Ct41[] = [];
+            const ct51Saved: Ct51[] = [];
 
             if (Array.isArray(updateDto.tai_khoan_list)) {
                 for (let i = 0; i < updateDto.tai_khoan_list.length; i++) {
                     const item = updateDto.tai_khoan_list[i];
-                    const ct41 = this.cashReceiptRepository.create({
+                    const ct51 = this.GiayBaoCoRepository.create({
                         stt_rec,
-                        ma_ct: 'PT1',
+                        ma_ct: 'BC1',
                         ngay_ct: updateDto.ngay_ct,
                         so_ct: updateDto.so_ct ?? '',
                         dien_giaii: item.dien_giai ?? '',
@@ -302,8 +302,8 @@ export class CashReceiptService {
                         so_ct0: '',
                         ty_giahtf2: 0,
                     });
-                    await this.cashReceiptRepository.save(ct41);
-                    ct41Saved.push(ct41);
+                    await this.GiayBaoCoRepository.save(ct51);
+                    ct51Saved.push(ct51);
                 }
             }
 
@@ -324,7 +324,7 @@ export class CashReceiptService {
                         const ct00 = this.ct00Repository.create({
                             stt_rec,
                             stt_rec0: rec.stt_rec0,
-                            ma_ct: 'PT1',
+                            ma_ct: 'BC1',
                             ma_gd: updateDto.ma_gd ?? '',
                             ngay_ct: updateDto.ngay_ct,
                             ngay_lct: updateDto.ngay_lct,
@@ -359,9 +359,9 @@ export class CashReceiptService {
                 }
             }
 
-            return { ct41: ct41Saved, ph41, ct00: ct00Saved };
+            return { ct51: ct51Saved, ph51, ct00: ct00Saved };
         } catch (error) {
-            throw new Error('Update CashReceipt failed: ' + error.message);
+            throw new Error('Update GiayBaoCo failed: ' + error.message);
         }
     }
 
@@ -370,23 +370,23 @@ export class CashReceiptService {
         try {
             // Xóa ct00 trước (nếu có)
             await this.ct00Repository.delete({ stt_rec });
-            // Xóa ph41
-            await this.ph41Repository.delete({ stt_rec });
-            // Xóa ct41 cuối cùng
-            await this.cashReceiptRepository.delete({ stt_rec });
+            // Xóa ph51
+            await this.ph51Repository.delete({ stt_rec });
+            // Xóa ct51 cuối cùng
+            await this.GiayBaoCoRepository.delete({ stt_rec });
         } catch (error) {
-            throw new Error('Remove CashReceipt failed: ' + error.message);
+            throw new Error('Remove GiayBaoCo failed: ' + error.message);
         }
     }
 
     /**
-     * Sinh mã stt_rec mới, đảm bảo không trùng trong bảng ph41
+     * Sinh mã stt_rec mới, đảm bảo không trùng trong bảng ph51
      */
     async generateUniqueSttRec(prefix = 'APT'): Promise<string> {
         try {
-            const last = await this.ph41Repository.createQueryBuilder('ph41')
-                .where("ph41.stt_rec LIKE :prefix", { prefix: `${prefix}%` })
-                .orderBy('ph41.stt_rec', 'DESC')
+            const last = await this.ph51Repository.createQueryBuilder('ph51')
+                .where("ph51.stt_rec LIKE :prefix", { prefix: `${prefix}%` })
+                .orderBy('ph51.stt_rec', 'DESC')
                 .getOne();
             let nextNumber = 1;
             if (last && last.stt_rec && last.stt_rec.length > prefix.length) {
@@ -398,7 +398,7 @@ export class CashReceiptService {
             let isExist = true;
             do {
                 stt_rec = `${prefix}${nextNumber.toString().padStart(8, '0')}`;
-                const found = await this.ph41Repository.findOneBy({ stt_rec });
+                const found = await this.ph51Repository.findOneBy({ stt_rec });
                 isExist = !!found;
                 if (isExist) nextNumber++;
             } while (isExist);

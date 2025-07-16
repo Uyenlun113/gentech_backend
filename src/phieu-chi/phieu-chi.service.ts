@@ -120,74 +120,84 @@ export class Ct46AccountingService {
         await queryRunner.startTransaction();
 
         try {
+            console.log('dto', dto);
             const { phieu, hachToan, hopDongThue } = dto;
-            const existingPh46 = await queryRunner.manager.findOne(this.ph46Repo.target, { where: { stt_rec } });
 
+            const existingPh46 = await queryRunner.manager.findOne(this.ph46Repo.target, {
+                where: { stt_rec },
+            });
             if (!existingPh46) throw new NotFoundException(`Không tìm thấy phiếu với STT_REC: ${stt_rec}`);
 
-            const ma_ct = phieu.so_ct?.trim();
+            const ma_ct = 'PC1';
             const ngay_ct = new Date(phieu.ngay_lct);
 
-            // Cập nhật PH46
+            // ✅ 1. Kiểm tra số chứng từ
+            await this.dataSource.query(
+                `EXEC CheckValidSoct#3 @Ma_qs = @0, @So_ct = @1`,
+                [ma_ct, phieu.so_ct]
+            );
+
+            // ✅ 2. Cập nhật PH46
             await queryRunner.manager.update(this.ph46Repo.target, { stt_rec }, {
                 ...phieu,
                 ngay_ct,
-                ma_ct: phieu.so_ct,
+                ma_ct,
             });
 
-            // Xóa CT46 cũ
-            await queryRunner.query(
-                `DELETE FROM CT46 WHERE stt_rec = '${stt_rec}'`
-            );
+            // ✅ 3. Xoá CT46 cũ
+            await this.ct46Repo.delete({ stt_rec });
 
-            // Thêm CT46 mới
+            // ✅ 4. Thêm CT46 mới nếu có dữ liệu
             const validHachToan = (Array.isArray(hachToan) ? hachToan : []).filter(ht =>
                 Object.values(ht).some(val => val !== null && val !== '')
             );
+
             if (validHachToan.length > 0) {
                 await queryRunner.manager.save(this.ct46Repo.target,
                     validHachToan.map(ht => ({
                         ...ht,
                         stt_rec,
-                        ma_ct: phieu.so_ct,
+                        ma_ct,
                         so_ct: phieu.so_ct,
                     }))
                 );
             }
 
-            // Xóa CT46GT cũ
-            await queryRunner.query(
-                `DELETE FROM CT46GT WHERE stt_rec = '${stt_rec}'`
-            );
+            // ✅ 5. Xoá CT46GT cũ
+            await this.ct46gtRepo.delete({ stt_rec });
 
-            // Thêm CT46GT mới
-            const validHopDongThue = (Array.isArray(hopDongThue) ? hopDongThue : []).filter(gt =>
-                Object.values(gt).some(val => val !== null && val !== '')
-            );
+            // ✅ 6. Thêm CT46GT mới nếu có dữ liệu
+            const validHopDongThue = Array.isArray(hopDongThue)
+                ? hopDongThue.filter(gt => Object.values(gt).some(val => val !== null && val !== ''))
+                : [];
+
             if (validHopDongThue.length > 0) {
-                await queryRunner.manager.save(this.ct46gtRepo.target,
+                await this.ct46gtRepo.save(
                     validHopDongThue.map(gt => ({
                         ...gt,
                         stt_rec,
-                        ma_ct: phieu.so_ct,
+                        ma_ct,
                     }))
                 );
+                console.log(validHopDongThue);
             }
 
-            // Cập nhật CT00
+            // ✅ 7. Cập nhật lại bảng CT00
             await queryRunner.manager.update(this.ct00Repo.target, { stt_rec }, {
                 ma_ct,
                 ma_kh: validHopDongThue[0]?.ma_kh?.trim() || null,
                 ngay_ct,
             });
 
+            // ✅ 8. Commit transaction
             await queryRunner.commitTransaction();
 
+            // ✅ 9. Gọi thủ tục xử lý cuối
             await this.dataSource.query(
-                `EXEC [dbo].[GLCTPK1-Checkdata] @status = '2', @stt_rec = '${stt_rec}'`
+                `EXEC [dbo].[CACTPC1-CheckData] @status = '2', @stt_rec = '${stt_rec}'`
             );
             await this.dataSource.query(
-                `EXEC [dbo].[GLCTPK1-Post] @stt_rec = '${stt_rec}', @ma_ct = '${ma_ct}'`
+                `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}', @ma_ct = '${ma_ct}'`
             );
 
             return { message: 'Cập nhật thành công', stt_rec };
@@ -198,6 +208,8 @@ export class Ct46AccountingService {
             await queryRunner.release();
         }
     }
+
+
 
     async delete(stt_rec: string) {
         const existingPh46 = await this.ph46Repo.findOne({ where: { stt_rec } });
@@ -224,10 +236,9 @@ export class Ct46AccountingService {
             .createQueryBuilder('ct46')
             .where('ct46.stt_rec = :stt_rec', { stt_rec })
             .getRawMany();
+
         console.log(ct46);
         const ct46gt = await this.ct46gtRepo.find({ where: { stt_rec } });
-
-        console.log("🚀 ~ Ct46AccountingService ~ findOne ~ ct46gt:", ct46gt)
         return {
             phieu: ph46,
             hachToan: ct46.map(item => ({
@@ -249,7 +260,7 @@ export class Ct46AccountingService {
                 mst_t: item.ct46_mst_t,
                 ten_vt_t: item.ct46_ten_vt_t,
                 ma_thue_i: item.ct46_ma_thue_i,
-                ghi_chu_t: item.ct46_ghi_chu_t,
+                ngay_ct: item.ct46_ngay_ct,
             })),
             hopDongThue: ct46gt.map(item => ({
                 so_seri0: item.so_seri0,
@@ -267,12 +278,7 @@ export class Ct46AccountingService {
                 ma_thue: item.ma_thue,
                 ma_ms: item.ma_ms,
                 mau_bc: item.mau_bc,
-                loai_hd: item.loai_hd,
-                tk_thue_i: item.tk_thue_i,
-                ghi_chu: item.ghi_chu,
-                tien: item.tien,
-                thue: item.thue,
-                tt: item.tt,
+                ngay_ct: item.ngay_ct
             }))
         };
     }

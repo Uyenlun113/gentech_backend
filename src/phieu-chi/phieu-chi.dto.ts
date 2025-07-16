@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumberString, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class PhieuCt46Dto {
     @IsNotEmpty()
@@ -189,34 +189,17 @@ class HachToanCt46Dto {
 }
 
 class HopDongThueCt46Dto {
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     so_ct0: string;
+
+    @IsOptional()
+    @Type(() => Date)
+    ngay_ct?: Date;
 
     @IsNotEmpty()
     @IsString()
     tk_thue_no: string;
-
-    @IsOptional()
-    tien?: number;
-
-    @IsOptional()
-    thue_suat?: number;
-
-    @IsOptional()
-    thue?: number;
-
-    @IsOptional()
-    tt?: number;
-
-
-    @IsOptional()
-    @IsString()
-    tk_thue_i?: string;
-
-    @IsOptional()
-    @IsString()
-    loai_hd?: string;
 
     @IsOptional()
     @IsString()
@@ -259,16 +242,20 @@ class HopDongThueCt46Dto {
     ghi_chu?: string;
 
     @IsOptional()
-    @IsString()
-    t_thue?: string;
+    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    t_thue?: number;
 
     @IsOptional()
-    @IsString()
-    t_tien?: string;
+    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    t_tien?: number;
 
     @IsOptional()
-    @IsString()
-    t_tt?: string;
+    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    t_tt?: number;
+
+    @IsOptional()
+    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    thue_suat?: number;
 }
 
 export class SaveCt46AccountingDto {

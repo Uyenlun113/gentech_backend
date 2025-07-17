@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAccountDto {
     @IsNotEmpty({ message: 'Mã tài khoản không được để trống' })
@@ -15,4 +15,10 @@ export class CreateAccountDto {
 
     @IsOptional()
     nh_tk?: string;
+
+    @IsOptional()
+    tk_sc?: number;
+
+    @IsOptional()
+    tk_cn?: number;
 }

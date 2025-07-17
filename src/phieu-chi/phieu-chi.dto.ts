@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class PhieuCt46Dto {
     @IsNotEmpty()
@@ -43,24 +43,59 @@ class PhieuCt46Dto {
     dien_giai?: string;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 1;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     ty_gia?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tien_nt?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tien?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_thue_nt?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_thue?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tt_nt?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tt?: number;
 
     @IsOptional()
@@ -80,6 +115,11 @@ class PhieuCt46Dto {
     ma_qs?: string;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 1;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     ty_giaf?: number;
 
     @IsOptional()
@@ -127,17 +167,36 @@ class HachToanCt46Dto {
     ngay_ct?: Date;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     tien?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     thue_suat?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     thue?: number;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     tt?: number;
-
 
     @IsOptional()
     @IsString()
@@ -191,15 +250,15 @@ class HachToanCt46Dto {
 class HopDongThueCt46Dto {
     @IsOptional()
     @IsString()
-    so_ct0: string;
+    so_ct0?: string;
 
     @IsOptional()
     @Type(() => Date)
     ngay_ct?: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    tk_thue_no: string;
+    tk_thue_no?: string;
 
     @IsOptional()
     @IsString()
@@ -207,7 +266,7 @@ class HopDongThueCt46Dto {
 
     @IsOptional()
     @IsString()
-    mau_bc?: string;
+    kh_mau_hd?: string;
 
     @IsOptional()
     @IsString()
@@ -241,21 +300,38 @@ class HopDongThueCt46Dto {
     @IsString()
     ghi_chu?: string;
 
+    // Các trường numeric - nhận số từ frontend, validate as number
     @IsOptional()
-    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
+    thue_suat?: number;
+
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_thue?: number;
 
     @IsOptional()
-    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tien?: number;
 
     @IsOptional()
-    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
+    @Transform(({ value }) => {
+        if (value === null || value === undefined || value === '') return 0;
+        return typeof value === 'string' ? parseFloat(value) : value;
+    })
+    @IsNumber()
     t_tt?: number;
-
-    @IsOptional()
-    @Transform(({ value }) => isNaN(value) ? 0 : Number(value))
-    thue_suat?: number;
 }
 
 export class SaveCt46AccountingDto {

@@ -277,7 +277,7 @@ export class Ct46AccountingService {
                 tk_thue_no: item.tk_thue_no,
                 ma_thue: item.ma_thue,
                 ma_ms: item.ma_ms,
-                mau_bc: item.mau_bc,
+                kh_mau_hd: item.kh_mau_hd,
                 ngay_ct: item.ngay_ct
             }))
         };

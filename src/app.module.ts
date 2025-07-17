@@ -11,6 +11,7 @@ import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
+import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 
 
 @Module({
@@ -41,7 +42,8 @@ import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
     DmkhoModule,
     DmvuviecModule,
     Ct46AccountingModule,
-    GiayBaoCoModule
+    GiayBaoCoModule,
+    GiayBaoNoModule
   ],
 })
 export class AppModule { }

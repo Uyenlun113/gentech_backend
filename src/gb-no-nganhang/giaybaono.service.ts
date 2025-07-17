@@ -1,37 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Ct51 } from './entity/ct51.entity';
-import { Ph51 } from './entity/ph51.entity';
+import { Ct56 } from './entity/ct56.entity';
+import { Ph56 } from './entity/ph56.entity';
+import { Ct56gt } from './entity/ct56gt.entity';
 import { Ct00 } from './entity/ct00.entity';
-import { CreateGiayBaoCoDto } from './dto/create-giaybaono.dto';
-import { UpdateGiayBaoCoDto } from './dto/update-giaybaono.dto';
-import { QueryGiayBaoCoDto } from './dto/query-giaybaono.dto';
+import { CreateGiayBaoNoDto } from './dto/create-giaybaono.dto';
+import { UpdateGiayBaoNoDto } from './dto/update-giaybaono.dto';
+import { QueryGiayBaoNoDto } from './dto/query-giaybaono.dto';
 
 @Injectable()
-export class GiayBaoCoService {
+export class GiayBaoNoService {
     constructor(
-        @InjectRepository(Ct51)
-        private readonly GiayBaoCoRepository: Repository<Ct51>,
-        @InjectRepository(Ph51)
-        private readonly ph51Repository: Repository<Ph51>,
+        @InjectRepository(Ct56)
+        private readonly GiayBaoNoRepository: Repository<Ct56>,
+        @InjectRepository(Ph56)
+        private readonly ph56Repository: Repository<Ph56>,
         @InjectRepository(Ct00)
         private readonly ct00Repository: Repository<Ct00>,
+        @InjectRepository(Ct56gt)
+        private readonly ct56gtRepository: Repository<Ct56gt>,
         private readonly dataSource: DataSource
     ) { }
 
     /**
-     * Tạo mới bản ghi ở ph51, ct51, ct00 theo dữ liệu từ DTO
+     * Tạo mới bản ghi ở ph56, ct56, ct00 theo dữ liệu từ DTO
      */
-    async create(createDto: CreateGiayBaoCoDto): Promise<{ ct51: Ct51[]; ph51: Ph51; ct00: Ct00[] }> {
+    async create(createDto: CreateGiayBaoNoDto): Promise<{ ct56: Ct56[]; ph56: Ph56; ct00: Ct00[] }> {
         // 1. Sinh mã stt_rec
         const stt_rec = await this.generateUniqueSttRec();
-        let ph51Saved: Ph51 | null = null;
-        let ct51Saved: Ct51[] = [];
+        let ph56Saved: Ph56 | null = null;
+        let ct56Saved: Ct56[] = [];
         let ct00Saved: Ct00[] = [];
         try {
-            // 1. Tạo ph51 trước
-            const ph51 = this.ph51Repository.create({
+            await this.dataSource.query(
+                `EXEC CheckValidSoct @Ma_qs = @0, @So_ct = @1, @Stt_rec = @2`,
+                ["BC1", createDto.so_ct, stt_rec]
+            );
+            // 1. Tạo ph56 trước
+            const ph56 = this.ph56Repository.create({
                 stt_rec: stt_rec,
                 ma_gd: createDto.ma_gd ?? '',
                 ma_kh: createDto.ma_kh ?? '2',
@@ -65,19 +72,19 @@ export class GiayBaoCoService {
                 hd_thue: "0",
                 sysflag: 'P',
             });
-            await this.ph51Repository.insert(ph51);
-            ph51Saved = ph51
+            await this.ph56Repository.insert(ph56);
+            ph56Saved = ph56
         } catch (error) {
-            throw new Error('Create ph51 failed: ' + error.message);
+            throw new Error('Create ph56 failed: ' + error.message);
         }
 
         try {
-            // 2. Tạo ct51 cho từng tài khoản trong array
-            ct51Saved = [];
+            // 2. Tạo ct56 cho từng tài khoản trong array
+            ct56Saved = [];
             if (Array.isArray(createDto.tai_khoan_list) && createDto.tai_khoan_list.length > 0) {
                 for (let i = 0; i < createDto.tai_khoan_list.length; i++) {
                     const item = createDto.tai_khoan_list[i];
-                    const ct51 = this.GiayBaoCoRepository.create({
+                    const ct56 = this.GiayBaoNoRepository.create({
                         stt_rec: stt_rec,
                         ma_ct: 'BC1',
                         ngay_ct: createDto.ngay_ct,
@@ -93,17 +100,50 @@ export class GiayBaoCoService {
                         so_ct0: '',
                         ty_giahtf2: 0,
                     });
-                    this.GiayBaoCoRepository.insert(ct51);
-                    const saved = ct51
-                    ct51Saved.push(saved);
+                    this.GiayBaoNoRepository.insert(ct56);
+                    const saved = ct56
+                    ct56Saved.push(saved);
                 }
             }
         } catch (error) {
-            // Nếu lỗi khi tạo ct51 thì xóa ph51
-            if (ph51Saved) await this.ph51Repository.delete({ stt_rec });
-            throw new Error('Create ct51 failed: ' + error.message);
+            // Nếu lỗi khi tạo ct56 thì xóa ph56
+            if (ph56Saved) await this.ph56Repository.delete({ stt_rec });
+            throw new Error('Create ct56 failed: ' + error.message);
         }
-
+        try {
+            const validGT = Array.isArray(createDto.hopDongThue)
+                ? createDto.hopDongThue.filter(gt =>
+                    Object.values(gt).some(val => val !== null && val !== '')
+                )
+                : [];
+            for (let i = 0; i < validGT.length; i++) {
+                const gt = validGT[i];
+                const ct56gt = this.ct56gtRepository.create({
+                    stt_rec: stt_rec,
+                    stt_rec0: (i + 1).toString().padStart(3, '0'),
+                    so_ct0: gt.so_ct0?.trim() || '',
+                    ma_ms: gt.ma_ms?.trim() || '',
+                    kh_mau_hd: gt.kh_mau_hd?.trim() || '',
+                    so_seri0: gt.so_seri0?.trim() || '',
+                    ngay_ct: gt.ngay_ct,
+                    ma_kh: gt.ma_kh?.trim() || '',
+                    ten_kh: gt.ten_kh?.trim() || '',
+                    dia_chi: gt.dia_chi?.trim() || '',
+                    ma_so_thue: gt.ma_so_thue?.trim() || '',
+                    ten_vt: gt.ten_vt?.trim() || '',
+                    t_tien: gt.t_tien ?? 0,
+                    ma_thue: gt.ma_thue?.trim() || '',
+                    thue_suat: gt.thue_suat ?? 0,
+                    t_thue: gt.t_thue ?? 0,
+                    tk_thue_no: gt.tk_thue_no?.trim() || '',
+                    tk_du: gt.tk_du?.trim() || '',
+                    t_tt: gt.t_tt ?? 0,
+                });
+                await this.ct56gtRepository.insert(ct56gt);
+            }
+        } catch (error) {
+            throw new Error('Create ct00 failed: ' + error.message);
+        }
         try {
             // 3. Tạo ct00 cho từng tài khoản trong array (mỗi item tạo 2 bản ghi)
             ct00Saved = [];
@@ -155,18 +195,18 @@ export class GiayBaoCoService {
                 }
             }
         } catch (error) {
-            // Nếu lỗi khi tạo ct00 thì xóa ct51 và ph51
-            if (ct51Saved) await this.GiayBaoCoRepository.delete({ stt_rec });
-            if (ph51Saved) await this.ph51Repository.delete({ stt_rec });
+            // Nếu lỗi khi tạo ct00 thì xóa ct56 và ph56
+            if (ct56Saved) await this.GiayBaoNoRepository.delete({ stt_rec });
+            if (ph56Saved) await this.ph56Repository.delete({ stt_rec });
             throw new Error('Create ct00 failed: ' + error.message);
         }
         await this.dataSource.query(
-            `EXEC [dbo].[CACTPT1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'BC1'`
+            `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'BN1'`
         );
-        return { ct51: ct51Saved, ph51: ph51Saved, ct00: ct00Saved };
+        return { ct56: ct56Saved, ph56: ph56Saved, ct00: ct00Saved };
     }
 
-    async findAll(query: QueryGiayBaoCoDto): Promise<{
+    async findAll(query: QueryGiayBaoNoDto): Promise<{
         data: any[];
         pagination: { page: number; limit: number; total: number; totalPages: number };
     }> {
@@ -174,31 +214,30 @@ export class GiayBaoCoService {
         const limit = Number(query.limit) || 5;
 
         try {
-            const queryBuilder = this.ph51Repository.createQueryBuilder('ph51');
+            const queryBuilder = this.ph56Repository.createQueryBuilder('ph56');
 
             if (query.search) {
                 const searchTerm = `%${query.search}%`;
                 queryBuilder.andWhere(
-                    '(ph51.ong_ba LIKE :search OR ph51.ma_gd LIKE :search OR ph51.so_ct LIKE :search)',
+                    '(ph56.ong_ba LIKE :search OR ph56.ma_gd LIKE :search OR ph56.so_ct LIKE :search)',
                     { search: searchTerm }
                 );
             }
 
-            const [ph51Records, total] = await queryBuilder
-                .orderBy('ph51.stt_rec', 'DESC')
+            const [ph56Records, total] = await queryBuilder
+                .orderBy('ph56.stt_rec', 'DESC')
                 .skip((page - 1) * limit)
                 .take(limit)
                 .getManyAndCount();
 
-            // Build full records with ct51 and ct00
             const fullData = await Promise.all(
-                ph51Records.map(async (ph) => {
-                    const ct51List = await this.GiayBaoCoRepository.find({ where: { stt_rec: ph.stt_rec } });
+                ph56Records.map(async (ph) => {
+                    const ct56List = await this.GiayBaoNoRepository.find({ where: { stt_rec: ph.stt_rec } });
 
-                    const tai_khoan_list = ct51List.map((item) => ({
+                    const tai_khoan_list = ct56List.map((item) => ({
                         tk_so: item.tk_i,
                         tk_me: item.tk_i?.substring(0, 3) ?? '',
-                        ten_tai_khoan: '', // Nếu có mapping thì xử lý, hoặc dùng enum từ DB
+                        ten_tai_khoan: '',
                         ps_co: item.tien ?? 0,
                         dien_giai: item.dien_giaii ?? '',
                     }));
@@ -206,6 +245,11 @@ export class GiayBaoCoService {
                     const tong_tien = tai_khoan_list.reduce((sum, tk) => sum + (tk.ps_co || 0), 0);
 
                     const ct00 = await this.ct00Repository.findOne({ where: { stt_rec: ph.stt_rec } });
+
+                    // 🔽 Lấy danh sách hợp đồng thuế (ct56gt)
+                    const hopDongThue = await this.ct56gtRepository.find({
+                        where: { stt_rec: ph.stt_rec },
+                    });
 
                     return {
                         stt_rec: ph.stt_rec,
@@ -224,8 +268,9 @@ export class GiayBaoCoService {
                         loai_ct: ph.loai_ct,
                         tai_khoan_list,
                         tong_tien,
-                        han_thanh_toan: 0, // nếu có, hoặc lấy từ ph51 nếu lưu ở đó
+                        han_thanh_toan: 0,
                         tk: ph.tk,
+                        hopDongThue, // ✅ Trả thêm hợp đồng thuế ở đây
                     };
                 })
             );
@@ -240,28 +285,33 @@ export class GiayBaoCoService {
                 },
             };
         } catch (error) {
-            throw new Error('FindAll GiayBaoCo failed: ' + error.message);
+            throw new Error('FindAll GiayBaoNo failed: ' + error.message);
         }
     }
 
-    async findOne(stt_rec: string): Promise<Ct51 | null> {
+
+    async findOne(stt_rec: string): Promise<Ct56 | null> {
         try {
-            return await this.GiayBaoCoRepository.findOneBy({ stt_rec });
+            return await this.GiayBaoNoRepository.findOneBy({ stt_rec });
         } catch (error) {
-            throw new Error('FindOne GiayBaoCo failed: ' + error.message);
+            throw new Error('FindOne GiayBaoNo failed: ' + error.message);
         }
     }
 
     /**
-     * Cập nhật đồng thời ct51, ph51, ct00 theo dữ liệu từ DTO
+     * Cập nhật đồng thời ct56, ph56, ct00 theo dữ liệu từ DTO
      */
     async update(
         stt_rec: string,
-        updateDto: UpdateGiayBaoCoDto
-    ): Promise<{ ct51: Ct51[]; ph51: Ph51 | null; ct00: Ct00[] }> {
+        updateDto: UpdateGiayBaoNoDto
+    ): Promise<{ ct56: Ct56[]; ph56: Ph56 | null; ct00: Ct00[] }> {
         try {
-            // 1. Cập nhật ph51
-            await this.ph51Repository.update({ stt_rec }, {
+            await this.dataSource.query(
+                `EXEC CheckValidSoct @Ma_qs = @0, @So_ct = @1, @Stt_rec = @2`,
+                ["BC1", updateDto.so_ct, stt_rec]
+            );
+            // 1. Cập nhật ph56
+            await this.ph56Repository.update({ stt_rec }, {
                 ma_gd: updateDto.ma_gd,
                 ma_kh: updateDto.ma_kh,
                 dia_chi: updateDto.dia_chi,
@@ -276,17 +326,17 @@ export class GiayBaoCoService {
                 loai_ct: updateDto.loai_ct,
             });
 
-            const ph51 = await this.ph51Repository.findOne({ where: { stt_rec } });
+            const ph56 = await this.ph56Repository.findOne({ where: { stt_rec } });
 
-            // 2. Xóa và tạo lại ct51
-            await this.GiayBaoCoRepository.delete({ stt_rec });
+            // 2. Xóa và tạo lại ct56
+            await this.GiayBaoNoRepository.delete({ stt_rec });
 
-            const ct51Saved: Ct51[] = [];
+            const ct56Saved: Ct56[] = [];
 
             if (Array.isArray(updateDto.tai_khoan_list)) {
                 for (let i = 0; i < updateDto.tai_khoan_list.length; i++) {
                     const item = updateDto.tai_khoan_list[i];
-                    const ct51 = this.GiayBaoCoRepository.create({
+                    const ct56 = this.GiayBaoNoRepository.create({
                         stt_rec,
                         ma_ct: 'BC1',
                         ngay_ct: updateDto.ngay_ct,
@@ -302,11 +352,43 @@ export class GiayBaoCoService {
                         so_ct0: '',
                         ty_giahtf2: 0,
                     });
-                    await this.GiayBaoCoRepository.save(ct51);
-                    ct51Saved.push(ct51);
+                    await this.GiayBaoNoRepository.save(ct56);
+                    ct56Saved.push(ct56);
                 }
             }
+            await this.ct56gtRepository.delete({ stt_rec });
 
+            const ct56gtSaved: Ct56gt[] = [];
+
+            if (Array.isArray(updateDto.hopDongThue)) {
+                for (let i = 0; i < updateDto.hopDongThue.length; i++) {
+                    const item = updateDto.hopDongThue[i];
+                    const ct56gt = this.ct56gtRepository.create({
+                        stt_rec,
+                        stt_rec0: (i + 1).toString().padStart(3, '0'),
+                        so_ct0: item.so_ct0 ?? '',
+                        ngay_ct: item.ngay_ct,
+                        tk_thue_no: item.tk_thue_no ?? '',
+                        ma_ms: item.ma_ms ?? '',
+                        kh_mau_hd: item.kh_mau_hd ?? '',
+                        ma_kh: item.ma_kh ?? '',
+                        so_seri0: item.so_seri0 ?? '',
+                        ten_kh: item.ten_kh ?? '',
+                        dia_chi: item.dia_chi ?? '',
+                        ma_so_thue: item.ma_so_thue ?? '',
+                        ten_vt: item.ten_vt ?? '',
+                        ma_thue: item.ma_thue ?? '',
+                        // ghi_chu: item.ghi_chu ?? '',
+                        thue_suat: item.thue_suat ?? 0,
+                        t_thue: item.t_thue ?? 0,
+                        t_tien: item.t_tien ?? 0,
+                        t_tt: item.t_tt ?? 0,
+                        tk_du: item.tk_du ?? '',
+                    });
+                    await this.ct56gtRepository.save(ct56gt);
+                    ct56gtSaved.push(ct56gt);
+                }
+            }
             // 3. Xóa và tạo lại ct00
             await this.ct00Repository.delete({ stt_rec });
 
@@ -358,10 +440,12 @@ export class GiayBaoCoService {
                     }
                 }
             }
-
-            return { ct51: ct51Saved, ph51, ct00: ct00Saved };
+            await this.dataSource.query(
+                `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'BN1'`
+            );
+            return { ct56: ct56Saved, ph56, ct00: ct00Saved };
         } catch (error) {
-            throw new Error('Update GiayBaoCo failed: ' + error.message);
+            throw new Error('Update GiayBaoNo failed: ' + error.message);
         }
     }
 
@@ -370,23 +454,23 @@ export class GiayBaoCoService {
         try {
             // Xóa ct00 trước (nếu có)
             await this.ct00Repository.delete({ stt_rec });
-            // Xóa ph51
-            await this.ph51Repository.delete({ stt_rec });
-            // Xóa ct51 cuối cùng
-            await this.GiayBaoCoRepository.delete({ stt_rec });
+            // Xóa ph56
+            await this.ph56Repository.delete({ stt_rec });
+            // Xóa ct56 cuối cùng
+            await this.GiayBaoNoRepository.delete({ stt_rec });
         } catch (error) {
-            throw new Error('Remove GiayBaoCo failed: ' + error.message);
+            throw new Error('Remove GiayBaoNo failed: ' + error.message);
         }
     }
 
     /**
-     * Sinh mã stt_rec mới, đảm bảo không trùng trong bảng ph51
+     * Sinh mã stt_rec mới, đảm bảo không trùng trong bảng ph56
      */
     async generateUniqueSttRec(prefix = 'APT'): Promise<string> {
         try {
-            const last = await this.ph51Repository.createQueryBuilder('ph51')
-                .where("ph51.stt_rec LIKE :prefix", { prefix: `${prefix}%` })
-                .orderBy('ph51.stt_rec', 'DESC')
+            const last = await this.ph56Repository.createQueryBuilder('ph56')
+                .where("ph56.stt_rec LIKE :prefix", { prefix: `${prefix}%` })
+                .orderBy('ph56.stt_rec', 'DESC')
                 .getOne();
             let nextNumber = 1;
             if (last && last.stt_rec && last.stt_rec.length > prefix.length) {
@@ -398,7 +482,7 @@ export class GiayBaoCoService {
             let isExist = true;
             do {
                 stt_rec = `${prefix}${nextNumber.toString().padStart(8, '0')}`;
-                const found = await this.ph51Repository.findOneBy({ stt_rec });
+                const found = await this.ph56Repository.findOneBy({ stt_rec });
                 isExist = !!found;
                 if (isExist) nextNumber++;
             } while (isExist);

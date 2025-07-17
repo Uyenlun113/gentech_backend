@@ -12,7 +12,7 @@
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
-export class QueryGiayBaoCoDto {
+export class QueryGiayBaoNoDto {
     @IsOptional()
     @IsString()
     search?: string;

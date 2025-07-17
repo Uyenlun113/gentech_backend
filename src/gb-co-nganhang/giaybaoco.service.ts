@@ -30,6 +30,10 @@ export class GiayBaoCoService {
         let ct51Saved: Ct51[] = [];
         let ct00Saved: Ct00[] = [];
         try {
+            await this.dataSource.query(
+                `EXEC CheckValidSoct @Ma_qs = @0, @So_ct = @1, @Stt_rec = @2`,
+                ["BC1", createDto.so_ct, stt_rec]
+            );
             // 1. Tạo ph51 trước
             const ph51 = this.ph51Repository.create({
                 stt_rec: stt_rec,
@@ -260,6 +264,11 @@ export class GiayBaoCoService {
         updateDto: UpdateGiayBaoCoDto
     ): Promise<{ ct51: Ct51[]; ph51: Ph51 | null; ct00: Ct00[] }> {
         try {
+
+            await this.dataSource.query(
+                `EXEC CheckValidSoct @Ma_qs = @0, @So_ct = @1, @Stt_rec = @2`,
+                ["BC1", updateDto.so_ct, stt_rec]
+            );
             // 1. Cập nhật ph51
             await this.ph51Repository.update({ stt_rec }, {
                 ma_gd: updateDto.ma_gd,
@@ -358,7 +367,9 @@ export class GiayBaoCoService {
                     }
                 }
             }
-
+            await this.dataSource.query(
+                `EXEC [dbo].[CACTPT1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'BC1'`
+            );
             return { ct51: ct51Saved, ph51, ct00: ct00Saved };
         } catch (error) {
             throw new Error('Update GiayBaoCo failed: ' + error.message);

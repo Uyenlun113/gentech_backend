@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity('ct51') // tên bảng trong database
-export class Ct51 {
+@Entity('ct56') // tên bảng trong database
+export class Ct56 {
   @Column()
   stt_rec: string;
 

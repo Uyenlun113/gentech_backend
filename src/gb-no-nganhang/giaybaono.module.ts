@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GiayBaoCoService } from './giaybaono.service';
-import { GiayBaoCoController } from './giaybaono.controller';
-import { Ct51 } from './entity/ct51.entity';
-import { Ph51 } from './entity/ph51.entity';
+import { GiayBaoNoService } from './giaybaono.service';
+import { GiayBaoNoController } from './giaybaono.controller';
+import { Ct56 } from './entity/ct56.entity';
+import { Ph56 } from './entity/ph56.entity';
 import { Ct00 } from './entity/ct00.entity';
+import { Ct56gt } from './entity/ct56gt.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ct51, Ph51, Ct00])],
-  providers: [GiayBaoCoService],
-  controllers: [GiayBaoCoController],
-  exports: [GiayBaoCoService],
+  imports: [TypeOrmModule.forFeature([Ct56, Ph56, Ct00, Ct56gt])],
+  providers: [GiayBaoNoService],
+  controllers: [GiayBaoNoController],
+  exports: [GiayBaoNoService],
 })
-export class GiayBaoCoModule {}
+export class GiayBaoNoModule { }

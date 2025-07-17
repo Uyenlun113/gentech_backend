@@ -359,6 +359,9 @@ export class CashReceiptService {
                 }
             }
 
+            await this.dataSource.query(
+                `EXEC [dbo].[CACTPT1-Post] @stt_rec = '${stt_rec}', @ma_ct = 'PT1'`
+            );
             return { ct41: ct41Saved, ph41, ct00: ct00Saved };
         } catch (error) {
             throw new Error('Update CashReceipt failed: ' + error.message);

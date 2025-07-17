@@ -1,6 +1,6 @@
 import { IsOptional, IsNumber, IsString } from 'class-validator';
 
-export class QueryGiayBaoCoDto {
+export class QueryGiayBaoNoDto {
     @IsOptional()
     @IsString()
     search?: string;

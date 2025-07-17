@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('ph51')
-export class Ph51 {
+@Entity('ph56')
+export class Ph56 {
   @PrimaryColumn()
   stt_rec: string;
 

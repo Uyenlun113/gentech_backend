@@ -10,6 +10,8 @@ import { GeneralAccountingModule } from './general-accounting/general-accounting
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
+import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
+import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 
 
 @Module({
@@ -39,7 +41,9 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     MaterialModule,
     DmkhoModule,
     DmvuviecModule,
-    Ct46AccountingModule
+    Ct46AccountingModule,
+    GiayBaoCoModule,
+    GiayBaoNoModule
   ],
 })
 export class AppModule { }

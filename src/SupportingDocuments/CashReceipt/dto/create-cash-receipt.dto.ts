@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsArray,
   ValidateNested,
+  IsDefined
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -41,7 +42,7 @@ export class CreateCashReceiptDto {
   ma_kh: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsDefined()
   dia_chi: string;
 
   // @IsString()
@@ -49,7 +50,7 @@ export class CreateCashReceiptDto {
   // mst: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsDefined()
   ong_ba: string;
 
   @IsString()

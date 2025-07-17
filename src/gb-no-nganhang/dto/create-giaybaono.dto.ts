@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsArray,
   ValidateNested,
+  IsDefined
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -96,7 +97,7 @@ export class CreateGiayBaoNoDto {
   ma_kh: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsDefined()
   dia_chi: string;
 
   // @IsString()
@@ -104,7 +105,7 @@ export class CreateGiayBaoNoDto {
   // mst: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsDefined()
   ong_ba: string;
 
   @IsString()

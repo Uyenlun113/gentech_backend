@@ -87,6 +87,8 @@ export class AccountDirectoryService {
                 tk_me: dto.tk_me,
                 ma_nt: dto.ma_nt,
                 nh_tk: dto.nh_tk,
+                tk_sc: dto.tk_sc,
+                tk_cn: dto.tk_cn
             });
             const savedAccount = await this.accountDirectoryRepository.save(account);
 

@@ -6,12 +6,14 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
+import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
+import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
-import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
-import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
+import { DmsttModule } from './dmstt/dmstt.module';
+import { CdtkModule } from './cdtk/cdtk.module';
 
 
 @Module({
@@ -43,7 +45,9 @@ import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
     DmvuviecModule,
     Ct46AccountingModule,
     GiayBaoCoModule,
-    GiayBaoNoModule
+    GiayBaoNoModule,
+    DmsttModule,
+    CdtkModule
   ],
 })
 export class AppModule { }

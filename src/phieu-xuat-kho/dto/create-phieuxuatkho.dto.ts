@@ -10,7 +10,7 @@ import {
 import { Type } from 'class-transformer';
 
 // DTO cho từng item trong array
-export class PhieuNhapKhoItemDto {
+export class PhieuXuatKhoItemDto {
   @IsString()
   @IsNotEmpty()
   ma_vt: string;
@@ -39,7 +39,7 @@ export class PhieuNhapKhoItemDto {
 }
 
 // DTO chính
-export class CreatePhieuNhapKhoDto {
+export class CreatePhieuXuatKhoDto {
   @IsString()
   @IsNotEmpty()
   ma_gd: string;
@@ -87,6 +87,6 @@ export class CreatePhieuNhapKhoDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => PhieuNhapKhoItemDto)
-  hang_hoa_list: PhieuNhapKhoItemDto[];
+  @Type(() => PhieuXuatKhoItemDto)
+  hang_hoa_list: PhieuXuatKhoItemDto[];
 }

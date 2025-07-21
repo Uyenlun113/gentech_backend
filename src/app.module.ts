@@ -13,6 +13,7 @@ import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { PhieuNhapKhoModule } from './phieu-nhap-kho/phieu-nhap-kho.module';
+import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { DmsttModule } from './dmstt/dmstt.module';
 import { CdtkModule } from './cdtk/cdtk.module';
 
@@ -48,8 +49,9 @@ import { CdtkModule } from './cdtk/cdtk.module';
     GiayBaoCoModule,
     GiayBaoNoModule,
     PhieuNhapKhoModule,
+    PhieuXuatKhoModule,
     DmsttModule,
-    CdtkModule
+    CdtkModule,
   ],
 })
 export class AppModule { }

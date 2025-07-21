@@ -13,25 +13,29 @@ export class CdtkService {
 
     // ✅ Thêm mới
     async createBulk(data: CdtkDto[]): Promise<CdtkEntity[]> {
-        const result: CdtkEntity[] = [];
+        if (data.length === 0) return [];
 
-        for (const item of data) {
-            const existing = await this.cdtkRepo.findOne({
-                where: {
-                    nam: item.nam,
-                    tk: item.tk,
-                },
-            });
+        // Tạo mảng điều kiện OR (nam và tk)
+        const whereConditions = data.map(item => ({
+            nam: item.nam,
+            tk: item.tk,
+        }));
 
-            if (!existing) {
-                const newItem = this.cdtkRepo.create(item);
-                const saved = await this.cdtkRepo.save(newItem);
-                result.push(saved);
-            }
+        // Tìm chỉ 1 bản ghi tồn tại
+        const existing = await this.cdtkRepo.findOne({
+            where: whereConditions,
+        });
+
+        // Nếu đã có 1 bản ghi tồn tại thì không thêm gì cả
+        if (existing) {
+            return []; // hoặc throw new Error('Đã tồn tại một bản ghi')
         }
 
-        return result;
+        // Nếu chưa tồn tại thì insert tất cả
+        const newRecords = this.cdtkRepo.create(data);
+        return await this.cdtkRepo.save(newRecords);
     }
+
 
     // ✅ Lấy danh sách theo năm
     async findByYear(nam: number): Promise<CdtkEntity[]> {

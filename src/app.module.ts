@@ -4,18 +4,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
+import { CdtkModule } from './cdtk/cdtk.module';
 import { DmkhoModule } from './dmkho/dmkho.module';
+import { DmsttModule } from './dmstt/dmstt.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
 import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
 import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
-import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { PhieuNhapKhoModule } from './phieu-nhap-kho/phieu-nhap-kho.module';
+import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
-import { DmsttModule } from './dmstt/dmstt.module';
-import { CdtkModule } from './cdtk/cdtk.module';
+import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { CdtkModule } from './cdtk/cdtk.module';
     PhieuXuatKhoModule,
     DmsttModule,
     CdtkModule,
+    Ph85Module
   ],
 })
 export class AppModule { }

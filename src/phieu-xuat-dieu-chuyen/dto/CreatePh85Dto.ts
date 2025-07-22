@@ -2,20 +2,10 @@ import { Type } from 'class-transformer';
 import { IsArray, IsDateString, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class CreateCt85Dto {
-    @IsString()
-    stt_rec: string;
-
-    @IsString()
-    @IsOptional()
-    ma_ct?: string;
 
     @IsString()
     @IsOptional()
     so_ct?: string;
-
-    @IsString()
-    @IsOptional()
-    ma_qs?: string;
 
     @IsDateString()
     @IsOptional()
@@ -33,14 +23,15 @@ export class CreateCt85Dto {
     @IsOptional()
     ma_nx_i?: string;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    so_luong?: string;
+    so_luong?: number;
 }
 
 export class CreatePh85Dto {
     @IsString()
-    stt_rec: string;
+    @IsOptional()
+    ma_qs?: string;
 
     @IsString()
     @IsOptional()
@@ -82,8 +73,22 @@ export class CreatePh85Dto {
     @IsOptional()
     status?: string;
 
+    @IsString()
+    @IsOptional()
+    so_ct?: string;
+
+    @IsString()
+    @IsOptional()
+    hd_lenhdd?: string;
+}
+
+export class CreatePh85DtoWithVatTu {
+    @ValidateNested()
+    @Type(() => CreatePh85Dto)
+    phieu: CreatePh85Dto;
+
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateCt85Dto)
-    ct85List: CreateCt85Dto[];
+    vatTu: CreateCt85Dto[];
 }

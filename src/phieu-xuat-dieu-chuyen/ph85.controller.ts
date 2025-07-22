@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
-import { CreatePh85Dto } from './dto/CreatePh85Dto';
+import { CreatePh85Dto, CreatePh85DtoWithVatTu } from './dto/CreatePh85Dto';
 import { Ph85Service } from './ph85.service';
 
 @Controller('ph85')
@@ -8,12 +8,12 @@ export class Ph85Controller {
     constructor(private readonly ph85Service: Ph85Service) { }
 
     @Post()
-    async create(@Body() dto: CreatePh85Dto) {
+    async create(@Body() dto: CreatePh85DtoWithVatTu) {
         return this.ph85Service.createPhieuXuat(dto);
     }
 
     @Patch('update/:stt_rec')
-    async update(@Body() dto: CreatePh85Dto, @Param('stt_rec') stt_rec: string) {
+    async update(@Body() dto: CreatePh85DtoWithVatTu, @Param('stt_rec') stt_rec: string) {
         return this.ph85Service.updatePhieuXuat(dto, stt_rec);
     }
 

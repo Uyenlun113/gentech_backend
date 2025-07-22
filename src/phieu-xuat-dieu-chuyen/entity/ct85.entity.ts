@@ -1,12 +1,16 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Material } from 'src/material/material.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('ct85')
 export class Ct85Entity {
-    @PrimaryColumn({ type: 'char', length: 11 })
-    stt_rec: string;
+    @PrimaryColumn({ type: 'char', length: 8 })
+    dvt2: string;
 
-    @Column({ type: 'char', nullable: true })
+    @Column({ type: 'char' })
     ma_ct: string;
+
+    @Column({ type: 'char', length: 11 })
+    stt_rec: string;
 
     @Column({ type: 'smalldatetime', nullable: true })
     ngay_ct: Date;
@@ -21,5 +25,9 @@ export class Ct85Entity {
     ma_nx_i: string;
 
     @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
-    so_luong: string;
+    so_luong: number;
+
+    @ManyToOne(() => Material, { eager: false })
+    @JoinColumn({ name: 'ma_vt', referencedColumnName: 'ma_vt' })
+    vatTu: Material;
 }

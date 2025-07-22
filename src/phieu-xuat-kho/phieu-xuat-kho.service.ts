@@ -100,18 +100,33 @@ export class PhieuXuatKhoService {
             stt_rec: stt_rec,
             stt_rec0: (i + 1).toString().padStart(3, '0'),
             ma_ct: 'PND',
+            ma_gd: createDto.ma_gd ?? '',
             ngay_ct: createDto.ngay_ct ?? new Date(),
+            ngay_lct: createDto.ngay_lct,
             so_ct: createDto.so_ct ?? '',
-            dien_giai: createDto.dien_giai ?? '',
-            tk: String(item.tk_vt ?? ''),         // Ensure string type
-            // ma_vt: String(item.ma_vt ?? ''),      // Ensure string type
-            // gia_nt: Number(item.gia ?? 0),        // Convert to number
-            // gia: Number(item.gia ?? 0),           // Convert to number
-            // tien_nt: Number(item.tien ?? 0),      // Convert to number
-            // tien: Number(item.tien ?? 0),         // Convert to number
-            // ma_kho: String(item.ma_kho_i ?? ''),  // Ensure string type
-            ma_dvcs: 'CTY',
+            ong_ba: createDto.ong_ba ?? '',
+            dien_giai: item.dien_giai ?? '',
+            ma_nt: createDto.ma_nt ?? '',
+            ty_gia: createDto.ty_gia ?? 1,
+            ma_kh: createDto.ma_kh ?? '',
+            ma_qs: createDto.ma_qs ?? '',
+            nh_dk: "A01",
+            tk: String(item.tk_vt ?? ''),  
+            tk_du: '',
+            ps_no_nt: 0,
+            ps_co_nt: 0,
+            ty_gia_ht: 1,
+            ty_gia_ht2: 1,
+            ps_co: 0,
+            ps_no: 0,
+            ct_nxt: 0,
+            ma_vv: "",
             status: '2',
+            ma_dvcs: 'CTY',
+            so_seri0: "",
+            loai_ct: '2',
+            dien_giai0: item.dien_giai ?? '',
+            nh_dkc: 'A01',
           });
           await this.ct00Repository.insert(ct00);
           ct00Saved.push(ct00);
@@ -283,15 +298,36 @@ export class PhieuXuatKhoService {
           ct84Saved.push(ct84);
 
           const ct00 = this.ct00Repository.create({
-            stt_rec,
+           stt_rec: stt_rec,
             stt_rec0: (i + 1).toString().padStart(3, '0'),
             ma_ct: 'PND',
+            ma_gd: updateDto.ma_gd ?? '',
             ngay_ct: updateDto.ngay_ct ?? new Date(),
+            ngay_lct: updateDto.ngay_lct,
             so_ct: updateDto.so_ct ?? '',
-            dien_giai: updateDto.dien_giai ?? '',
-            tk: String(item.tk_vt ?? ''),
-            ma_dvcs: 'CTY',
+            ong_ba: updateDto.ong_ba ?? '',
+            dien_giai: item.dien_giai ?? '',
+            ma_nt: updateDto.ma_nt ?? '',
+            ty_gia: updateDto.ty_gia ?? 1,
+            ma_kh: updateDto.ma_kh ?? '',
+            ma_qs: updateDto.ma_qs ?? '',
+            nh_dk: "A01",
+            tk: String(item.tk_vt ?? ''),  
+            tk_du: '',
+            ps_no_nt: 0,
+            ps_co_nt: 0,
+            ty_gia_ht: 1,
+            ty_gia_ht2: 1,
+            ps_co: 0,
+            ps_no: 0,
+            ct_nxt: 0,
+            ma_vv: "",
             status: '2',
+            ma_dvcs: 'CTY',
+            so_seri0: "",
+            loai_ct: '2',
+            dien_giai0: item.dien_giai ?? '',
+            nh_dkc: 'A01',
           });
           await this.ct00Repository.insert(ct00);
           ct00Saved.push(ct00);

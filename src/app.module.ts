@@ -5,6 +5,7 @@ import { AccountDirectoryModule } from './account-directory/account-directory.mo
 import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { CdtkModule } from './cdtk/cdtk.module';
+import { CdvtModule } from './cdvt/cdvt.module';
 import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmsttModule } from './dmstt/dmstt.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
@@ -53,7 +54,8 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     PhieuXuatKhoModule,
     DmsttModule,
     CdtkModule,
-    Ph85Module
+    Ph85Module,
+    CdvtModule
   ],
 })
 export class AppModule { }

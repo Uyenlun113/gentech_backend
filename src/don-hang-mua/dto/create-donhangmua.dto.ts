@@ -21,8 +21,8 @@ export class HangHoaItemDto {
     // @IsNotEmpty()
     tien_nt0: number;
 
-    @IsNumber()
-    ma_thue: number;
+    @IsString()
+    ma_thue: string;
 
     @IsNumber()
     thue_suat: number;
@@ -66,22 +66,6 @@ export class HangHoaItemDto {
     @IsNumber()
     gia_nt: number;
 }
-export class ChiPhiItemDto {
-    @IsString()
-    @IsNotEmpty()
-    ma_vt: string;
-
-    @IsString()
-    ten_vt: string;
-
-    @IsNumber()
-    // @IsNotEmpty()
-    tien_nt0: number;
-
-    @IsNumber()
-    // @IsNotEmpty()
-    cp: number;
-}
 // DTO chính
 export class CreateDonHangMuaDto {
     @IsString()
@@ -117,22 +101,17 @@ export class CreateDonHangMuaDto {
     @IsNumber()
     ty_gia: number;
 
-    @IsNumber()
-    tien_nt0: number;
+    // @IsNumber()
+    // tien_nt0: number;
 
-    @IsNumber()
-    ma_thue: number;
+    // @IsString()
+    // ma_thue: string;
 
     // Array của các tài khoản
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => HangHoaItemDto)
     hang_hoa_list: HangHoaItemDto[];
-
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => ChiPhiItemDto)
-    chi_phi_list: ChiPhiItemDto[];
 
     @IsNumber()
     t_cp: number;

@@ -203,8 +203,8 @@ export class Dmhdmct {
   @Column('decimal', { precision: 1, scale: 0 })
   sua_tk_vt: number;
 
-  @Column('decimal', { precision: 1, scale: 0 })
-  ma_thue: number;
+  @Column({ length: 16 })
+  ma_thue: string;
 
   @Column('decimal', { precision: 6, scale: 2 })
   thue_suat: number;

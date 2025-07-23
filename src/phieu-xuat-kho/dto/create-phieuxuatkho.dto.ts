@@ -36,6 +36,9 @@ export class PhieuXuatKhoItemDto {
   @IsNumber()
   @Type(() => Number)
   ma_nx_i: number;
+
+  @IsString()
+  dien_giai: string;
 }
 
 // DTO chính

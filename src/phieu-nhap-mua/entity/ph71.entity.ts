@@ -1,9 +1,11 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Ct71Entity } from "./ct71.entity";
+import { Ct71GtEntity } from "./ct71gt.entity";
 
 @Entity('ph71')
 export class Ph71Entity {
     @PrimaryColumn('varchar', { length: 11 })
-    stt_rect: string
+    stt_rec: string
 
     @PrimaryColumn('char', { length: 16 })
     ma_ct: string
@@ -64,4 +66,11 @@ export class Ph71Entity {
 
     @Column({ name: 'ngay_lct', type: 'smalldatetime' })
     ngay_lct: Date;
+
+    @OneToMany(() => Ct71Entity, (ct71) => ct71.ph71)
+    ct71: Ct71Entity[];
+
+    @OneToMany(() => Ct71GtEntity, (ct71gt) => ct71gt.ph71)
+    ct71gt: Ct71GtEntity[];
+    
 }

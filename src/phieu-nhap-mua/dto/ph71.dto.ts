@@ -2,11 +2,6 @@ import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePh71Dto {
-    @IsString()
-    stt_rect: string;
-
-    @IsString()
-    ma_ct: string;
 
     @IsString()
     ma_kh: string;

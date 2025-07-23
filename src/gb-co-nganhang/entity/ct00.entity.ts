@@ -5,7 +5,7 @@ export class Ct00 {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @PrimaryColumn()
   stt_rec: string;
 
   @Column({ nullable: true })

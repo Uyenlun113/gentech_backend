@@ -111,7 +111,7 @@ export class PhieuXuatKhoService {
             ma_kh: createDto.ma_kh ?? '',
             ma_qs: createDto.ma_qs ?? '',
             nh_dk: "A01",
-            tk: String(item.tk_vt ?? ''),  
+            tk: String(item.tk_vt ?? ''),
             tk_du: '',
             ps_no_nt: 0,
             ps_co_nt: 0,
@@ -138,7 +138,7 @@ export class PhieuXuatKhoService {
       throw new Error('Create ct84/ct00 failed: ' + error.message);
     }
     await this.dataSource.query(
-      `EXEC [dbo].[INCTPND-Post] @stt_rec = '${stt_rec}'`
+      `EXEC [dbo].[INCTPXD-Post] @stt_rec = '${stt_rec}'`
     );
     return { ct84: ct84Saved, ph84: ph84Saved, ct00: ct00Saved };
   }
@@ -294,11 +294,11 @@ export class PhieuXuatKhoService {
             tien_nt: Number(item.tien ?? 0),
             tien: Number(item.tien ?? 0),
           });
-          await this.ct84Repository.insert(ct84);
+          await this.ct84Repository.save(ct84);
           ct84Saved.push(ct84);
 
           const ct00 = this.ct00Repository.create({
-           stt_rec: stt_rec,
+            stt_rec: stt_rec,
             stt_rec0: (i + 1).toString().padStart(3, '0'),
             ma_ct: 'PND',
             ma_gd: updateDto.ma_gd ?? '',
@@ -312,7 +312,7 @@ export class PhieuXuatKhoService {
             ma_kh: updateDto.ma_kh ?? '',
             ma_qs: updateDto.ma_qs ?? '',
             nh_dk: "A01",
-            tk: String(item.tk_vt ?? ''),  
+            tk: String(item.tk_vt ?? ''),
             tk_du: '',
             ps_no_nt: 0,
             ps_co_nt: 0,
@@ -329,14 +329,14 @@ export class PhieuXuatKhoService {
             dien_giai0: item.dien_giai ?? '',
             nh_dkc: 'A01',
           });
-          await this.ct00Repository.insert(ct00);
-          ct00Saved.push(ct00);
+          let data = await this.ct00Repository.save(ct00);
+          ct00Saved.push(data);
         }
       }
 
       // Gọi thủ tục
       await this.dataSource.query(
-        `EXEC [dbo].[INCTPND-Post] @stt_rec = '${stt_rec}'`
+        `EXEC [dbo].[INCTPXD-Post] @stt_rec = '${stt_rec}'`
       );
 
       return { ct84: ct84Saved, ph84, ct00: ct00Saved };

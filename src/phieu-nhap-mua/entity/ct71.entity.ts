@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Ph71Entity } from "./ph71.entity";
 
 @Entity('ct71')
 export class Ct71Entity {
@@ -35,5 +36,7 @@ export class Ct71Entity {
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     so_luong: number;
 
-
+    @ManyToOne(() => Ph71Entity, ph71 => ph71.ct71gt, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
+    ph71: Ph71Entity;
 }

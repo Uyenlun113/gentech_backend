@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Ph71Entity } from "./ph71.entity";
 
 @Entity('ct71gt')
 export class Ct71GtEntity {
@@ -44,9 +45,6 @@ export class Ct71GtEntity {
     @Column('varchar', { length: 128, nullable: true })
     ten_kh: string;
 
-    @Column('char', { length: 16, nullable: true })
-    ma_dvcs: string;
-
     @Column('smalldatetime', { nullable: true })
     ngay_ct0: Date;
 
@@ -71,4 +69,7 @@ export class Ct71GtEntity {
     @Column('varchar', { length: 16, nullable: true })
     tk_thue_no: string;
 
+    @ManyToOne(() => Ph71Entity, ph71 => ph71.ct71gt, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
+    ph71: Ph71Entity;
 }

@@ -2,14 +2,6 @@ import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateCt71GtDto {
-    @IsString()
-    stt_rec: string;
-
-    @IsString()
-    ma_ct: string;
-
-    @IsString()
-    so_ct: string;
 
     @IsOptional()
     @IsString()

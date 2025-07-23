@@ -3,12 +3,6 @@ import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateCt71Dto {
     @IsString()
-    stt_rec: string;
-
-    @IsString()
-    ma_ct: string;
-
-    @IsString()
     ma_kho_i: string;
 
     @IsOptional()

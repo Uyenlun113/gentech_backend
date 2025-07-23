@@ -12,10 +12,10 @@ export class CreateFullPh71Dto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateCt71Dto)
-    ct71: CreateCt71Dto[];
+    hangHoa: CreateCt71Dto[];
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateCt71GtDto)
-    ct71gt: CreateCt71GtDto[];
+    hdThue: CreateCt71GtDto[];
 }

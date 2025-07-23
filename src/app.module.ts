@@ -56,8 +56,8 @@ import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
     DmsttModule,
     CdtkModule,
     Ph85Module,
-    DonHangMuaModule
-    CdvtModule
+    DonHangMuaModule,
+    CdvtModule,
 
   ],
 })

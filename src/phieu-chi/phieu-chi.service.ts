@@ -91,6 +91,7 @@ export class Ct46AccountingService {
                 ma_dvcs,
                 stt_rec,
                 ngay_ct,
+                stt_rec0: "001",
                 ma_kh: validGT[0]?.ma_kh?.trim() || null,
             });
 

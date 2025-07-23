@@ -8,6 +8,9 @@ export class Ct00Entity {
     @Column({ name: 'stt_rec', type: 'char', length: 11 })
     stt_rec: string;
 
+    @Column({ name: 'stt_rec0', type: 'char', length: 11 })
+    stt_rec0: string;
+
     @Column({ name: 'ma_dvcs', type: 'char', length: 8 })
     ma_dvcs: string;
 
@@ -23,5 +26,5 @@ export class Ct00Entity {
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;
 
-    
+
 }

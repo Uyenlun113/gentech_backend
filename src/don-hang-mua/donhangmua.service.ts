@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Dmhdm } from './entity/dmhdm.entity';
 import { Dmhdmct } from './entity/dmhdmct.entity';
-import { CreateDonHangMuaDto, HangHoaItemDto, ChiPhiItemDto } from './dto/create-donhangmua.dto';
+import { CreateDonHangMuaDto, HangHoaItemDto } from './dto/create-donhangmua.dto';
 import { UpdateDonhangmuaDto } from './dto/update-donhangmua.dto';
 
 @Injectable()
@@ -18,81 +18,114 @@ export class DonhangmuaService {
 
     async create(dto: CreateDonHangMuaDto) {
         // 1. Lưu vào dmhdm
-        const stt_rec = await this.generateUniqueSttRec();
-        const { hang_hoa_list, ...phData } = dto;
-        const dmhdm = this.dmhdmRepo.create({
-            ...phData,
-            stt_rec,
-        });
-        const savedDmhdm = await this.dmhdmRepo.save(dmhdm);
+        try {
+            const stt_rec = await this.generateUniqueSttRec();
+            const { hang_hoa_list, ...phData } = dto;
+            const dmhdm = {
+                stt_rec,
+                ...phData,
+            };
+            const savedDmhdm = await this.dmhdmRepo.save(dmhdm);
 
-        // 2. Lưu vào dmhdmct cho từng cặp hàng hóa và chi phí
-        const hangHoaList = dto.hang_hoa_list || [];
-        const chiPhiList = dto.chi_phi_list || [];
-        for (let i = 0; i < hangHoaList.length; i++) {
-            const hangHoa = hangHoaList[i];
-            const chiPhi = chiPhiList[i];
-            const ct = this.dmhdmctRepo.create({
-                stt_rec: stt_rec,
-                stt_rec0: (i + 1).toString().padStart(3, '0'),
-                ma_ct: savedDmhdm.ma_ct,
-                ngay_ct: savedDmhdm.ngay_ct,
-                so_ct: savedDmhdm.so_ct,
-                // Hàng hóa
-                ma_vt: hangHoa?.ma_vt ?? '',
-                tien0: Number(hangHoa?.tien0) ?? 0,
-                tien_nt0: Number(hangHoa?.tien_nt0) ?? 0,
-                ma_thue: Number(hangHoa?.ma_thue) ?? 0,
-                thue_suat: Number(hangHoa?.thue_suat) ?? 0,
-                thue: Number(hangHoa?.thue) ?? 0,
-                // Chi phí
-                cp: chiPhi?.cp ?? 0,
-                // Các trường khác mặc định
-            });
-            await this.dmhdmctRepo.save(ct);
+            const dataDmhdm = await this.dmhdmRepo.findOne({ where: { stt_rec: stt_rec } });
+            // 2. Lưu vào dmhdmct cho từng cặp hàng hóa và chi phí
+            const hangHoaList = dto.hang_hoa_list || [];
+
+            for (let i = 0; i < hangHoaList.length; i++) {
+                const hangHoa = hangHoaList[i];
+
+                const ct = this.dmhdmctRepo.create({
+                    stt_rec,
+                    stt_rec0: (i + 1).toString().padStart(3, '0'),
+                    ma_ct: dataDmhdm?.ma_ct?.trim() ?? '',
+                    ngay_ct: dataDmhdm?.ngay_ct,
+                    so_ct: dataDmhdm?.so_ct?.trim() ?? '',
+                    ma_vt: hangHoa.ma_vt ? hangHoa.ma_vt.trim() : '',
+                    tien0: Number(hangHoa.tien0 ?? 0),
+                    tien_nt0: Number(hangHoa.tien_nt0 ?? 0),
+                    ma_thue: hangHoa.ma_thue ? hangHoa.ma_thue.trim() : '',
+                    thue_suat: Number(hangHoa.thue_suat ?? 0),
+                    thue: Number(hangHoa.thue ?? 0),
+                    cp: Number(hangHoa.cp ?? 0),
+                    ma_kho_i: hangHoa.ma_kho_i ? hangHoa.ma_kho_i.trim() : '',
+                    so_luong: Number(hangHoa.so_luong ?? 0),
+                    gia0: Number(hangHoa.gia0 ?? 0),
+                    gia_nt0: Number(hangHoa.gia_nt0 ?? 0),
+                    tien: Number(hangHoa.tien ?? 0),
+                    tien_nt: Number(hangHoa.tien_nt ?? 0),
+                    tk_vt: hangHoa.tk_vt ? hangHoa.tk_vt.trim() : '',
+                    gia: Number(hangHoa.gia ?? 0),
+                    gia_nt: Number(hangHoa.gia_nt ?? 0),
+
+                });
+                await this.dmhdmctRepo.save(ct);
+            }
+            await this.dataSource.query(
+                `EXEC [dbo].[PODMHDM-Post] @stt_rec = '${stt_rec}'`
+            );
+            return this.getOne(stt_rec);
+        } catch (err) {
+            console.log('Error creating DonHangMua:', err);
         }
-        await this.dataSource.query(
-            `EXEC [dbo].[PODMHDM-Post] @stt_rec = '${stt_rec}'`
-        );
-        return this.getOne(savedDmhdm.stt_rec);
     }
 
     async update(id: string, dto: UpdateDonhangmuaDto) {
-        // Cập nhật dmhdm
-        const dmhdm = await this.dmhdmRepo.findOne({ where: { stt_rec: id } });
-        if (!dmhdm) return null;
+        try {
+            // 1. Tìm đơn hàng gốc
+            const dmhdm = await this.dmhdmRepo.findOne({ where: { stt_rec: id } });
+            if (!dmhdm) return null;
 
-        const { hang_hoa_list, ...phData } = dto;
-        await this.dmhdmRepo.update({ stt_rec: id }, phData);
-        // Xóa chi tiết cũ
-        await this.dmhdmctRepo.delete({ stt_rec: dmhdm.stt_rec });
+            const { hang_hoa_list = [], ...phData } = dto;
 
-        // Lưu lại chi tiết mới
-        const hangHoaList = dto.hang_hoa_list || [];
-        const chiPhiList = dto.chi_phi_list || [];
-        for (let i = 0; i < hangHoaList.length; i++) {
-            const hangHoa = hangHoaList[i];
-            const chiPhi = chiPhiList[i];
-            const ct = this.dmhdmctRepo.create({
-                stt_rec: dmhdm.stt_rec,
-                stt_rec0: (i + 1).toString().padStart(3, '0'),
-                ma_ct: dmhdm.ma_ct,
-                ngay_ct: dmhdm.ngay_ct,
-                so_ct: dmhdm.so_ct,
-                ma_vt: hangHoa?.ma_vt ?? '',
-                tien0: Number(hangHoa?.tien0) ?? 0,
-                tien_nt0: Number(hangHoa?.tien_nt0) ?? 0,
-                ma_thue: Number(hangHoa?.ma_thue) ?? 0,
-                thue_suat: Number(hangHoa?.thue_suat) ?? 0,
-                thue: Number(hangHoa?.thue) ?? 0,
-                cp: chiPhi?.cp ?? 0,
-            });
-            await this.dmhdmctRepo.save(ct);
+            // 2. Cập nhật đơn hàng (chỉ thông tin chung)
+            await this.dmhdmRepo.update({ stt_rec: id }, phData);
+
+            // Lấy lại bản ghi sau khi cập nhật
+            const updatedDmhdm = await this.dmhdmRepo.findOne({ where: { stt_rec: id } });
+            if (!updatedDmhdm) return null;
+
+            // 3. Xóa chi tiết cũ
+            await this.dmhdmctRepo.delete({ stt_rec: id });
+
+            // 4. Ghi lại danh sách chi tiết mới
+            for (let i = 0; i < hang_hoa_list.length; i++) {
+                const hangHoa = hang_hoa_list[i];
+                const ct = this.dmhdmctRepo.create({
+                    stt_rec: id,
+                    stt_rec0: (i + 1).toString().padStart(3, '0'),
+                    ma_ct: updatedDmhdm?.ma_ct?.trim() ?? '',
+                    ngay_ct: updatedDmhdm?.ngay_ct,
+                    so_ct: updatedDmhdm?.so_ct?.trim() ?? '',
+                    ma_vt: hangHoa.ma_vt ? hangHoa.ma_vt.trim() : '',
+                    tien0: Number(hangHoa.tien0 ?? 0),
+                    tien_nt0: Number(hangHoa.tien_nt0 ?? 0),
+                    ma_thue: hangHoa.ma_thue ? hangHoa.ma_thue.trim() : '',
+                    thue_suat: Number(hangHoa.thue_suat ?? 0),
+                    thue: Number(hangHoa.thue ?? 0),
+                    cp: Number(hangHoa.cp ?? 0),
+                    ma_kho_i: hangHoa.ma_kho_i ? hangHoa.ma_kho_i.trim() : '',
+                    so_luong: Number(hangHoa.so_luong ?? 0),
+                    gia0: Number(hangHoa.gia0 ?? 0),
+                    gia_nt0: Number(hangHoa.gia_nt0 ?? 0),
+                    tien: Number(hangHoa.tien ?? 0),
+                    tien_nt: Number(hangHoa.tien_nt ?? 0),
+                    tk_vt: hangHoa.tk_vt ? hangHoa.tk_vt.trim() : '',
+                    gia: Number(hangHoa.gia ?? 0),
+                    gia_nt: Number(hangHoa.gia_nt ?? 0),
+                });
+                await this.dmhdmctRepo.save(ct);
+            }
+
+            // 5. Gọi stored procedure cập nhật
+            await this.dataSource.query(
+                `EXEC [dbo].[PODMHDM-Post] @stt_rec = '${id}'`
+            );
+
+            // 6. Trả về dữ liệu đã cập nhật
+            return this.getOne(id);
+        } catch (err) {
+            console.log('Error updating DonHangMua:', err);
         }
-        await this.dataSource.query(
-            `EXEC [dbo].[PODMHDM-Post] @stt_rec = '${dmhdm.stt_rec}'`
-        );
-        return this.getOne(id);
     }
 
     async findAll(query: { search?: string; page?: number; limit?: number }) {
@@ -133,44 +166,37 @@ export class DonhangmuaService {
     async getOne(id: string) {
         const dmhdm = await this.dmhdmRepo.findOne({ where: { stt_rec: id } });
         if (!dmhdm) return null;
-        const dmhdmcts = await this.dmhdmctRepo.find({ where: { stt_rec: id }, order: { stt_rec0: 'ASC' } });
 
-        // Map lại thành 2 array đúng với DTO
-        const hang_hoa_list: any[] = [];
-        const chi_phi_list: any[] = [];
-        for (const ct of dmhdmcts) {
-            hang_hoa_list.push({
-                ma_vt: ct.ma_vt,
-                tien_nt0: ct.tien_nt0,
-                ma_thue: ct.ma_thue,
-                thue_suat: ct.thue_suat,
-                thue: ct.thue,
-                ma_kho_i: ct.ma_kho_i,
-                so_luong: ct.so_luong,
-                gia0: ct.gia0,
-                gia_nt0: ct.gia_nt0,
-                cp_nt: ct.cp_nt,
-                cp: ct.cp,
-                tien0: ct.tien0,
-                tien: ct.tien,
-                tien_nt: ct.tien_nt,
-                tk_vt: ct.tk_vt,
-                gia: ct.gia,
-                gia_nt: ct.gia_nt,
-            });
-            chi_phi_list.push({
-                ma_vt: ct.ma_vt,
-                tien_nt0: ct.tien_nt0,
-                cp: ct.cp,
-            });
-        }
+        const dmhdmcts = await this.dmhdmctRepo.find({
+            where: { stt_rec: id },
+            order: { stt_rec0: 'ASC' },
+        });
+        const hang_hoa_list = dmhdmcts.map((ct) => ({
+            ma_vt: ct.ma_vt.trim(),
+            tien_nt0: ct.tien_nt0,
+            ma_thue: ct.ma_thue,
+            thue_suat: ct.thue_suat,
+            thue: ct.thue,
+            ma_kho_i: ct.ma_kho_i,
+            so_luong: ct.so_luong,
+            gia0: ct.gia0,
+            gia_nt0: ct.gia_nt0,
+            cp_nt: ct.cp_nt,
+            cp: ct.cp,
+            tien0: ct.tien0,
+            tien: ct.tien,
+            tien_nt: ct.tien_nt,
+            tk_vt: ct.tk_vt,
+            gia: ct.gia,
+            gia_nt: ct.gia_nt,
+        }));
 
         return {
             ...dmhdm,
             hang_hoa_list,
-            chi_phi_list,
         };
     }
+
 
     remove(id: string) {
         return this.dmhdmRepo.delete(id);

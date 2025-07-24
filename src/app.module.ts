@@ -20,6 +20,7 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
+import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
 
 
 @Module({
@@ -57,9 +58,7 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     DmsttModule,
     CdtkModule,
     Ph85Module,
-    CdvtModule,
-    phieuMuaModule,
-    chiPhiMuaHangModule
+    CdvtModule
   ],
 })
 export class AppModule { }

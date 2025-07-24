@@ -25,13 +25,13 @@ export class ChiPhiMuaHangService {
         await queryRunner.connect();
 
         const { phieu, chiPhi, hdThue } = dto;
-        const stt_rec = `APNC${Date.now()}`.substring(0, 11); // đổi prefix nếu muốn
+        const stt_rec = `APNC${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_ct = 'PNC';
         const ty_gia = '1';
 
         try {
-            await queryRunner.startTransaction();
+
 
             if (hdThue?.length > 0) {
                 await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
@@ -42,7 +42,7 @@ export class ChiPhiMuaHangService {
                     hdThue[0]?.ma_so_thue,
                 ]);
             }
-
+            await queryRunner.startTransaction();
             await queryRunner.manager.save(Ph73Entity, {
                 ...phieu,
                 stt_rec,

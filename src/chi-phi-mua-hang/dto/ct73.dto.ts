@@ -30,6 +30,10 @@ export class CreateCt73Dto {
     tien_nt0?: number;
 
     @IsOptional()
+    @IsNumber()
+    cp_nt?: number;
+
+    @IsOptional()
     @IsString()
     tk_vt?: string;
 

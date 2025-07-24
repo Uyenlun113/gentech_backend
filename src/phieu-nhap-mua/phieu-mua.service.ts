@@ -1,7 +1,7 @@
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ct00Entity } from "src/general-accounting/entity/ct00.entity";
-import { DataSource, ILike, Repository } from "typeorm";
+import { Between, DataSource, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { CreateFullPh71Dto } from "./dto/create-full.dto";
 import { Ct71Entity } from "./entity/ct71.entity";
 import { Ct71GtEntity } from "./entity/ct71gt.entity";
@@ -223,26 +223,38 @@ export class phieuMuaService {
         }
     }
 
-    async getAllPh71(page: number, limit: number, search: string, so_ct?: string, ngay_lct?: string) {
+    async getAllPh71(
+        page: number,
+        limit: number,
+        search: string,
+        so_ct?: string,
+        tu_ngay?: string,
+        den_ngay?: string,
+    ) {
         const skip = (page - 1) * limit;
 
-        const whereCondition: any = [];
+        const where: any = {};
 
-        // Lọc theo search
         if (search) {
-            whereCondition.push(
+            where['$or'] = [
                 { dien_giai: ILike(`%${search}%`) },
                 { ma_kho: ILike(`%${search}%`) },
                 { ong_ba: ILike(`%${search}%`) },
-            );
+            ];
         }
+
         if (so_ct) {
-            whereCondition.push({ so_ct });
+            where.so_ct = so_ct;
         }
-        if (ngay_lct) {
-            whereCondition.push({ ngay_lct: new Date(ngay_lct) });
+
+        if (tu_ngay && den_ngay) {
+            where.ngay_lct = Between(new Date(tu_ngay), new Date(den_ngay));
+        } else if (tu_ngay) {
+            where.ngay_lct = MoreThanOrEqual(new Date(tu_ngay));
+        } else if (den_ngay) {
+            where.ngay_lct = LessThanOrEqual(new Date(den_ngay));
         }
-        const where = whereCondition.length > 0 ? whereCondition : {};
+
         const [data, total] = await this.ph71Repository.findAndCount({
             where,
             relations: ['ct71', 'ct71gt'],

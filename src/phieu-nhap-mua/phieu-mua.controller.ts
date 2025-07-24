@@ -22,9 +22,10 @@ export class phieuMuaController {
         @Query('limit') limit = 10,
         @Query('search') search = '',
         @Query('so_ct') so_ct?: string,
-        @Query('ngay_lct') ngay_lct?: string,
+        @Query('tu_ngay') tu_ngay?: string,
+        @Query('den_ngay') den_ngay?: string,
     ) {
-        return this.phieuMuaService.getAllPh71(+page, +limit, search, so_ct, ngay_lct);
+        return this.phieuMuaService.getAllPh71(+page, +limit, search, so_ct, tu_ngay, den_ngay);
     }
 
     @Get(':stt_rec')

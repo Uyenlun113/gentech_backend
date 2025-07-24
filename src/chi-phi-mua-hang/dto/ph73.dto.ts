@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreatePh71Dto {
+export class CreatePh73Dto {
 
     @IsString()
     ma_kh: string;
@@ -70,19 +70,19 @@ export class CreatePh71Dto {
     @IsString()
     loai_pb?: string;
 
+    @IsOptional()
+    @IsString()
+    so_pn?: string;
+
     @Type(() => Date)
     @IsDate()
     ngay_ct: Date;
 
     @Type(() => Date)
     @IsDate()
+    ngay_pn: Date;
+
+    @Type(() => Date)
+    @IsDate()
     ngay_lct: Date;
-
-    @IsOptional()
-    @IsString()
-    ma_kh_i?: string;
-
-    @IsOptional()
-    @IsString()
-    tk_i?: string;
 }

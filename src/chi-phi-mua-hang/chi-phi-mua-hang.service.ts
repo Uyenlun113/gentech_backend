@@ -2,38 +2,37 @@ import { InternalServerErrorException, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ct00Entity } from "src/general-accounting/entity/ct00.entity";
 import { DataSource, ILike, Repository } from "typeorm";
-import { CreateFullPh71Dto } from "./dto/create-full.dto";
-import { Ct71Entity } from "./entity/ct71.entity";
-import { Ct71GtEntity } from "./entity/ct71gt.entity";
-import { Ph71Entity } from "./entity/ph71.entity";
+import { CreateFullPh73Dto } from "./dto/create-full.dto";
+import { Ct73Entity } from "./entity/ct73.entity";
+import { Ct73GtEntity } from "./entity/ct73gt.entity";
+import { Ph73Entity } from "./entity/ph73.entity";
 
-export class phieuMuaService {
+export class ChiPhiMuaHangService {
     constructor(
-        @InjectRepository(Ct71Entity)
-        private readonly ct71Repository: Repository<Ct71Entity>,
-        @InjectRepository(Ph71Entity)
-        private readonly ph71Repository: Repository<Ph71Entity>,
-        @InjectRepository(Ct71GtEntity)
-        private readonly ct71GtRepository: Repository<Ct71GtEntity>,
+        @InjectRepository(Ct73Entity)
+        private readonly ct73Repository: Repository<Ct73Entity>,
+        @InjectRepository(Ph73Entity)
+        private readonly ph73Repository: Repository<Ph73Entity>,
+        @InjectRepository(Ct73GtEntity)
+        private readonly ct73GtRepository: Repository<Ct73GtEntity>,
         @InjectRepository(Ct00Entity)
         private readonly ct00Repository: Repository<Ct00Entity>,
         private readonly dataSource: DataSource
     ) { }
-    async createFullPhieu(dto: CreateFullPh71Dto) {
+
+    async createFullPhieu(dto: CreateFullPh73Dto) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
 
-        const { phieu, hangHoa, hdThue } = dto;
-        const stt_rec = `APNA${Date.now()}`.substring(0, 11);
+        const { phieu, chiPhi, hdThue } = dto;
+        const stt_rec = `APNC${Date.now()}`.substring(0, 11); // đổi prefix nếu muốn
         const ma_dvcs = 'CTY';
-        const ma_ct = 'PNA';
+        const ma_ct = 'PNC';
         const ty_gia = '1';
 
         try {
-            // 👉 Giai đoạn 1: xử lý dữ liệu trong transaction
             await queryRunner.startTransaction();
 
-            // 1. CheckExistsHDvao nếu có dữ liệu
             if (hdThue?.length > 0) {
                 await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
                     stt_rec,
@@ -44,15 +43,14 @@ export class phieuMuaService {
                 ]);
             }
 
-            // 2. Insert PH71
-            await queryRunner.manager.save(Ph71Entity, {
+            await queryRunner.manager.save(Ph73Entity, {
                 ...phieu,
                 stt_rec,
                 ma_dvcs,
                 ma_ct,
                 ngay_ct: new Date(phieu.ngay_ct),
                 ngay_lct: new Date(phieu.ngay_lct),
-                ty_gia,
+                ty_gia
             });
 
             await queryRunner.manager.save(Ct00Entity, {
@@ -68,30 +66,27 @@ export class phieuMuaService {
                 ty_gia
             });
 
-            // 3. Delete + Insert CT71
-            await queryRunner.manager.delete(Ct71Entity, { stt_rec });
-            const ct71WithMeta = hangHoa.map(item => ({
+            await queryRunner.manager.delete(Ct73Entity, { stt_rec });
+            const ct73WithMeta = chiPhi.map(item => ({
                 ...item,
                 stt_rec,
                 ma_dvcs,
                 ma_ct,
-                ty_gia,
-                cp_nt: phieu.t_cp_nt,
+                ty_gia
             }));
-            await queryRunner.manager.save(Ct71Entity, ct71WithMeta);
+            await queryRunner.manager.save(Ct73Entity, ct73WithMeta);
 
-            // 4. Delete + Insert CT71GT
-            await queryRunner.manager.delete(Ct71GtEntity, { stt_rec });
-            const ct71gtWithMeta = hdThue.map(item => ({
+            await queryRunner.manager.delete(Ct73GtEntity, { stt_rec });
+            const ct73gtWithMeta = hdThue.map(item => ({
                 ...item,
                 stt_rec,
                 ma_ct,
                 ma_dvcs,
                 ty_gia
             }));
-            await queryRunner.manager.save(Ct71GtEntity, ct71gtWithMeta);
+            await queryRunner.manager.save(Ct73GtEntity, ct73gtWithMeta);
 
-            await queryRunner.commitTransaction(); // ✅ kết thúc transaction
+            await queryRunner.commitTransaction();
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw new InternalServerErrorException(error.message);
@@ -99,26 +94,24 @@ export class phieuMuaService {
             await queryRunner.release();
         }
 
-        // 👉 Giai đoạn 2: gọi các thủ tục yêu cầu Snapshot Isolation (ngoài transaction)
         try {
-            await this.dataSource.query(`EXEC [dbo].[POCTPNA-CheckData] @0, @1`, ['2', stt_rec]);
-            await this.dataSource.query(`EXEC [POCTPNA-Post] @0`, [stt_rec]);
+            await this.dataSource.query(`EXEC [dbo].[POCTPNC-CheckData] @0, @1`, ['2', stt_rec]);
+            await this.dataSource.query(`EXEC [POCTPNC-Post] @0`, [stt_rec]);
         } catch (error) {
             throw new InternalServerErrorException(`Lỗi khi gọi CheckData/Post: ${error.message}`);
         }
     }
 
-
-    async getPh71ById(stt_rec: string) {
-        const ph71 = await this.ph71Repository.findOne({
+    async getPh73ById(stt_rec: string) {
+        const ph73 = await this.ph73Repository.findOne({
             where: { stt_rec },
-            relations: ['ct71', 'ct71gt'],
+            relations: ['ct73', 'ct73gt'],
         });
-        return ph71;
+        return ph73;
     }
 
-    async updateFullPhieu(stt_rec: string, dto: CreateFullPh71Dto) {
-        const { phieu, hangHoa, hdThue } = dto;
+    async updateFullPhieu(stt_rec: string, dto: CreateFullPh73Dto) {
+        const { phieu, chiPhi, hdThue } = dto;
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -126,18 +119,16 @@ export class phieuMuaService {
 
         try {
             const ma_dvcs = 'CTY';
-            const ma_ct = 'PNA';
+            const ma_ct = 'PNC';
             const ty_gia = '1';
 
-            // 1. Kiểm tra tồn tại
-            const existing = await queryRunner.manager.findOne(Ph71Entity, {
+            const existing = await queryRunner.manager.findOne(Ph73Entity, {
                 where: { stt_rec, ma_ct },
             });
             if (!existing) {
                 throw new NotFoundException('Phiếu không tồn tại');
             }
 
-            // 2. CheckExistsHDvao nếu có
             if (hdThue?.length > 0) {
                 const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
                 await queryRunner.manager.query(
@@ -146,36 +137,34 @@ export class phieuMuaService {
                 );
             }
 
-            // 3. Update PH71
             await queryRunner.manager.update(
-                Ph71Entity,
+                Ph73Entity,
                 { stt_rec, ma_ct, ma_dvcs, ty_gia },
                 phieu,
             );
-            // 4. Delete + Insert CT71
-            await queryRunner.manager.delete(Ct71Entity, { stt_rec });
-            if (hangHoa?.length) {
-                const ct71WithMeta = hangHoa.map(item => ({
+
+            await queryRunner.manager.delete(Ct73Entity, { stt_rec });
+            if (chiPhi?.length) {
+                const ct73WithMeta = chiPhi.map(item => ({
                     ...item,
                     stt_rec,
                     ma_ct,
                     ma_dvcs,
                     ty_gia
                 }));
-                await queryRunner.manager.save(Ct71Entity, ct71WithMeta);
+                await queryRunner.manager.save(Ct73Entity, ct73WithMeta);
             }
 
-            // 5. Delete + Insert CT71GT
-            await queryRunner.manager.delete(Ct71GtEntity, { stt_rec });
+            await queryRunner.manager.delete(Ct73GtEntity, { stt_rec });
             if (hdThue?.length) {
-                const ct71gtWithMeta = hdThue.map(item => ({
+                const ct73gtWithMeta = hdThue.map(item => ({
                     ...item,
                     stt_rec,
                     ma_ct,
                     ma_dvcs,
                     ty_gia
                 }));
-                await queryRunner.manager.save(Ct71GtEntity, ct71gtWithMeta);
+                await queryRunner.manager.save(Ct73GtEntity, ct73gtWithMeta);
             }
 
             await queryRunner.commitTransaction();
@@ -186,33 +175,30 @@ export class phieuMuaService {
             await queryRunner.release();
         }
 
-        // 6. CheckData và Post sau khi transaction thành công
         try {
-            await this.dataSource.query(`EXEC [dbo].[POCTPNA-CheckData] @0, @1`, ['2', stt_rec]);
-            await this.dataSource.query(`EXEC [POCTPNA-Post] @0`, [stt_rec]);
+            await this.dataSource.query(`EXEC [dbo].[POCTPNC-CheckData] @0, @1`, ['2', stt_rec]);
+            await this.dataSource.query(`EXEC [POCTPNC-Post] @0`, [stt_rec]);
             return { message: 'Cập nhật phiếu thành công' };
         } catch (error) {
             throw new InternalServerErrorException(error.message || 'Lỗi Check/Post phiếu');
         }
     }
 
-
-    async deletePh71(stt_rec: string) {
+    async deletePh73(stt_rec: string) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
-            const ma_ct = 'PNA';
-            await this.dataSource.query(
-                `EXEC [dbo].[CheckEditVoucher] @0`,
-                [stt_rec]
-            );
+            const ma_ct = 'PNC';
+            await this.dataSource.query(`EXEC [dbo].[CheckEditVoucher] @0`, [stt_rec]);
 
-            await this.dataSource.query(
-                `EXEC [dbo].[DeleteVoucher] @0, @1`,
-                [ma_ct, stt_rec]
-            );
+            await queryRunner.manager.delete(Ct73GtEntity, { stt_rec });
+            await queryRunner.manager.delete(Ct73Entity, { stt_rec });
+            await queryRunner.manager.delete(Ph73Entity, { stt_rec });
+
+            await this.dataSource.query(`EXEC [dbo].[DeleteVoucher] @0, @1`, [ma_ct, stt_rec]);
+
             await queryRunner.commitTransaction();
             return { message: 'Xóa phiếu thành công' };
         } catch (error) {
@@ -223,29 +209,20 @@ export class phieuMuaService {
         }
     }
 
-    async getAllPh71(page: number, limit: number, search: string, so_ct?: string, ngay_lct?: string) {
+    async getAllPh73(page: number, limit: number, search: string) {
         const skip = (page - 1) * limit;
 
-        const whereCondition: any = [];
-
-        // Lọc theo search
-        if (search) {
-            whereCondition.push(
+        const whereCondition = search
+            ? [
                 { dien_giai: ILike(`%${search}%`) },
                 { ma_kho: ILike(`%${search}%`) },
                 { ong_ba: ILike(`%${search}%`) },
-            );
-        }
-        if (so_ct) {
-            whereCondition.push({ so_ct });
-        }
-        if (ngay_lct) {
-            whereCondition.push({ ngay_lct: new Date(ngay_lct) });
-        }
-        const where = whereCondition.length > 0 ? whereCondition : {};
-        const [data, total] = await this.ph71Repository.findAndCount({
-            where,
-            relations: ['ct71', 'ct71gt'],
+            ]
+            : {};
+
+        const [data, total] = await this.ph73Repository.findAndCount({
+            where: whereCondition,
+            relations: ['ct73', 'ct73gt'],
             skip,
             take: limit,
             order: { ngay_ct: 'DESC' },
@@ -260,6 +237,3 @@ export class phieuMuaService {
         };
     }
 }
-
-
-

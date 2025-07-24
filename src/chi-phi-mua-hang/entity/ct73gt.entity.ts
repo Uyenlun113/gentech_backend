@@ -1,8 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { Ph71Entity } from "./ph71.entity";
+import { Ph73Entity } from "./ph73.entity";
 
-@Entity('ct71gt')
-export class Ct71GtEntity {
+
+@Entity('ct73gt')
+export class Ct73GtEntity {
     @PrimaryColumn('varchar', { length: 11 })
     stt_rec: string;
 
@@ -66,11 +67,10 @@ export class Ct71GtEntity {
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_tt: number;
 
-
     @Column('varchar', { length: 16, nullable: true })
     tk_thue_no: string;
 
-    @ManyToOne(() => Ph71Entity, ph71 => ph71.ct71gt, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Ph73Entity, ph73 => ph73.ct73gt, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
-    ph71: Ph71Entity;
+    ph73: Ph73Entity;
 }

@@ -198,7 +198,11 @@ export class DonhangmuaService {
     }
 
 
-    remove(id: string) {
+    async remove(id: string) {
+        // Xóa chi tiết trước
+        await this.dmhdmctRepo.delete({ stt_rec: id });
+
+        // Xóa bản ghi chính
         return this.dmhdmRepo.delete(id);
     }
 

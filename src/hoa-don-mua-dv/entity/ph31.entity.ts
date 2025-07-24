@@ -77,8 +77,8 @@ export class Ph31 {
   @Column({ nullable: true })
   time: string;
 
-  @Column({ nullable: true })
-  status: string;
+  // @Column({ nullable: true })
+  // status: string;
 
   @Column({ nullable: true })
   ma_qs: string;

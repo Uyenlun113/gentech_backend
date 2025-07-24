@@ -48,24 +48,38 @@ export class HoaDonMuaDVService {
                 dia_chi: createDto.dia_chi ?? '',
                 ong_ba: createDto.ong_ba ?? '',
                 dien_giai: createDto.dien_giai ?? '',
-                ngay_ct: createDto.ngay_ct ?? '',
-                ngay_lct: createDto.ngay_lct ?? '',
+                ngay_ct: createDto.ngay_ct ?? new Date(),
+                ngay_lct: createDto.ngay_lct ?? new Date(),
+                ngay_ct0: createDto.ngay_ct ?? new Date(),
+
+                ma_ct: '',
+                ma_dvcs: '',
                 ma_qs: createDto.ma_qs ?? '',
                 so_ct: createDto.so_ct ?? '',
-                ma_nt: createDto.ma_nt ?? '',
+                so_ct0: '',
+                so_seri0: '',
+
+                ma_nt: createDto.ma_nt ?? 'VND',
                 ty_gia: createDto.ty_gia ?? 1,
-                ma_nx: createDto.ma_nx,
-                ma_dvcs: 'CTY',
-                ma_ct: 'PN1',
-                t_thue_nt: 0,
+
                 t_thue: 0,
-                t_tt_nt: 0,
+                t_thue_nt: 0,
+                t_tien: 0,
+                t_tien_nt: 0,
+
+                ma_nx: createDto.ma_nx ?? '',
                 date: new Date(),
-                time: "",
                 date0: new Date(),
-                status: '2',
-                ty_giaf: 1,
+                t_tt:
+                    0,
+                t_tt_nt:
+                    0,
+                time:
+                    "",
+                ty_giaf:
+                    0,
             });
+
             await this.ph31Repository.insert(ph31);
             ph31Saved = ph31;
         } catch (error) {
@@ -130,7 +144,7 @@ export class HoaDonMuaDVService {
                     time: '',
                     date0: new Date(),
                     time0: '',
-                    status: '2',
+                    // status: '2',
                     ty_giaf: createDto.ty_gia ?? "1",
                 });
                 await this.ct31gtRepository.insert(ct31gt);
@@ -173,7 +187,7 @@ export class HoaDonMuaDVService {
                             ps_no: rec.ps_no,
                             ct_nxt: 0,
                             ma_vv: "",
-                            status: '2',
+                            // status: '2',
                             ma_dvcs: 'CTY',
                             so_seri0: "",
                             loai_ct: '2',
@@ -261,7 +275,7 @@ export class HoaDonMuaDVService {
                         so_ct: ph.so_ct,
                         ma_nt: ph.ma_nt,
                         ty_gia: ph.ty_gia,
-                        status: Number(ph.status),
+                        // status: ph.status ?? "",
                         ma_nx: ph.ma_nx,
                         // tk_thue_no: ph.tk_thue_no,
                         t_tien: ph.t_tien,
@@ -402,7 +416,7 @@ export class HoaDonMuaDVService {
                     time: '',
                     date0: new Date(),
                     time0: '',
-                    status: '2',
+                    // status: '2',
                     ty_giaf: updateDto.ty_gia ?? 1,
                 });
                 await this.ct31gtRepository.insert(ct31gt);
@@ -444,7 +458,7 @@ export class HoaDonMuaDVService {
                             ps_no: rec.ps_no,
                             ct_nxt: 0,
                             ma_vv: "",
-                            status: '2',
+                            // status: '2',
                             ma_dvcs: 'CTY',
                             so_seri0: "",
                             loai_ct: '2',
@@ -516,7 +530,7 @@ export class HoaDonMuaDVService {
             let stt_rec: string;
             let isExist = true;
             do {
-                stt_rec = `${prefix}${nextNumber.toString().padStart(8, '0')}`;
+                stt_rec = `${prefix}${nextNumber.toString().padStart(7, '0')}`;
                 const found = await this.ph31Repository.findOneBy({ stt_rec });
                 isExist = !!found;
                 if (isExist) nextNumber++;

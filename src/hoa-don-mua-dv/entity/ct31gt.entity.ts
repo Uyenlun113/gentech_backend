@@ -80,8 +80,8 @@ export class Ct31gt {
   @Column({ nullable: true })
   time0: string;
 
-  @Column({ nullable: true })
-  status: string;
+  // @Column({ nullable: true })
+  // status: string;
 
   @Column({ nullable: true })
   ma_thue: string;

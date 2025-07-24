@@ -116,8 +116,8 @@ export class CreateHoaDonMuaDVDto {
   @IsNumber()
   ty_gia: number;
 
-  @IsNumber()
-  status: number;
+  // @IsString()
+  // status: string;
 
   // Array lưu vào ct31
   @IsArray()

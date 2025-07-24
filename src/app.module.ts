@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { CdtkModule } from './cdtk/cdtk.module';
 import { CdvtModule } from './cdvt/cdvt.module';
+import { chiPhiMuaHangModule } from './chi-phi-mua-hang/chi-phi-mua-hang.module';
 import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmsttModule } from './dmstt/dmstt.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
@@ -15,6 +16,7 @@ import { GeneralAccountingModule } from './general-accounting/general-accounting
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { PhieuNhapKhoModule } from './phieu-nhap-kho/phieu-nhap-kho.module';
+import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
@@ -55,7 +57,9 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     DmsttModule,
     CdtkModule,
     Ph85Module,
-    CdvtModule
+    CdvtModule,
+    phieuMuaModule,
+    chiPhiMuaHangModule
   ],
 })
 export class AppModule { }

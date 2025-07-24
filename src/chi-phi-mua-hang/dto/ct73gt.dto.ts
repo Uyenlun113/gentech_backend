@@ -1,10 +1,60 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreatePh71Dto {
+export class CreateCt73GtDto {
 
+    @IsOptional()
     @IsString()
-    ma_kh: string;
+    ma_gd?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_hd?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_kho?: string;
+
+    @IsOptional()
+    @IsString()
+    ten_vt?: string;
+
+    @IsOptional()
+    @IsNumber()
+    so_luong?: number;
+
+    @IsOptional()
+    @IsNumber()
+    gia?: number;
+
+    @IsOptional()
+    @IsNumber()
+    t_thue?: number;
+
+    @IsOptional()
+    @IsString()
+    so_ct0?: string;
+
+    @IsOptional()
+    @IsString()
+    so_seri0?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_kh?: string;
+
+    @IsOptional()
+    @IsString()
+    ten_kh?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_dvcs?: string;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    ngay_ct0?: Date;
 
     @IsOptional()
     @IsString()
@@ -15,74 +65,22 @@ export class CreatePh71Dto {
     ma_so_thue?: string;
 
     @IsOptional()
-    @IsString()
-    dien_giai?: string;
-
-    @IsOptional()
-    @IsString()
-    ma_qs?: string;
+    @IsNumber()
+    t_tien?: number;
 
     @IsOptional()
     @IsNumber()
-    t_so_luong?: number;
+    thue_suat?: number;
 
     @IsOptional()
     @IsNumber()
-    t_tien_nt?: number;
+    han_tt?: number;
 
     @IsOptional()
     @IsNumber()
-    t_tien_nt0?: number;
-
-    @IsOptional()
-    @IsNumber()
-    t_cp_nt?: number;
-
-    @IsOptional()
-    @IsNumber()
-    t_thue?: number;
-
-    @IsOptional()
-    @IsNumber()
-    t_tt_nt?: number;
+    t_tt?: number;
 
     @IsOptional()
     @IsString()
     tk_thue_no?: string;
-
-    @IsOptional()
-    @IsString()
-    status?: string;
-
-    @IsOptional()
-    @IsString()
-    ma_dvcs?: string;
-
-    @IsOptional()
-    @IsString()
-    so_ct?: string;
-
-    @IsOptional()
-    @IsString()
-    ong_ba?: string;
-
-    @IsOptional()
-    @IsString()
-    loai_pb?: string;
-
-    @Type(() => Date)
-    @IsDate()
-    ngay_ct: Date;
-
-    @Type(() => Date)
-    @IsDate()
-    ngay_lct: Date;
-
-    @IsOptional()
-    @IsString()
-    ma_kh_i?: string;
-
-    @IsOptional()
-    @IsString()
-    tk_i?: string;
 }

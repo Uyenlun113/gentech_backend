@@ -1,9 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { Ct71Entity } from "./ct71.entity";
-import { Ct71GtEntity } from "./ct71gt.entity";
+import { Ct73Entity } from "./ct73.entity";
+import { Ct73GtEntity } from "./ct73gt.entity";
 
-@Entity('ph71')
-export class Ph71Entity {
+
+@Entity('ph73')
+export class Ph73Entity {
     @PrimaryColumn('varchar', { length: 11 })
     stt_rec: string
 
@@ -30,7 +31,6 @@ export class Ph71Entity {
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_tien_nt: number
-
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_tien_nt0: number
@@ -71,16 +71,22 @@ export class Ph71Entity {
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;
 
-    @Column({ type: 'varchar', length: 16, nullable: true })
-    ty_gia: string
-
     @Column({ name: 'ngay_lct', type: 'smalldatetime' })
     ngay_lct: Date;
 
-    @OneToMany(() => Ct71Entity, (ct71) => ct71.ph71)
-    ct71: Ct71Entity[];
+    @Column({ type: 'smalldatetime' })
+    ngay_pn: Date;
 
-    @OneToMany(() => Ct71GtEntity, (ct71gt) => ct71gt.ph71)
-    ct71gt: Ct71GtEntity[];
+    @Column({ type: 'varchar', length: 16, nullable: true })
+    so_pn: string
+
+    @Column({ type: 'varchar', length: 16, nullable: true })
+    ty_gia: string
+
+    @OneToMany(() => Ct73Entity, (ct73) => ct73.ph73)
+    ct73: Ct73Entity[];
+
+    @OneToMany(() => Ct73GtEntity, (ct73gt) => ct73gt.ph73)
+    ct73gt: Ct73GtEntity[];
 
 }

@@ -1,13 +1,17 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { Ph71Entity } from "./ph71.entity";
+import { Ph73Entity } from "./ph73.entity";
 
-@Entity('ct71')
-export class Ct71Entity {
+
+@Entity('ct73')
+export class Ct73Entity {
     @PrimaryColumn('varchar', { length: 11 })
     stt_rec: string;
 
     @PrimaryColumn('char', { length: 16 })
     ma_ct: string;
+
+    @PrimaryColumn('char', { length: 16 })
+    so_ct: string;
 
     @PrimaryColumn('char', { length: 16 })
     ma_kho_i: string;
@@ -30,17 +34,20 @@ export class Ct71Entity {
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     tien_nt0: number;
 
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    cp_nt: number;
-
     @Column('varchar', { length: 16, nullable: true })
     tk_vt: string;
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     so_luong: number;
 
+    @Column('numeric', { precision: 16, scale: 2, nullable: true })
+    cp_nt: number;
 
-    @ManyToOne(() => Ph71Entity, ph71 => ph71.ct71gt, { onDelete: 'CASCADE' })
+    @Column('numeric', { precision: 16, scale: 2, nullable: true })
+    cp: number;
+
+
+    @ManyToOne(() => Ph73Entity, ph73 => ph73.ct73gt, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
-    ph71: Ph71Entity;
+    ph73: Ph73Entity;
 }

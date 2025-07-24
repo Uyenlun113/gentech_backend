@@ -10,6 +10,7 @@ import { chiPhiMuaHangModule } from './chi-phi-mua-hang/chi-phi-mua-hang.module'
 import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmsttModule } from './dmstt/dmstt.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
+import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
 import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
 import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
@@ -20,7 +21,6 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
-import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
 
 
 @Module({
@@ -58,7 +58,11 @@ import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
     DmsttModule,
     CdtkModule,
     Ph85Module,
-    CdvtModule
+    CdvtModule,
+    phieuMuaModule,
+    chiPhiMuaHangModule,
+    DonHangMuaModule,
+
   ],
 })
 export class AppModule { }

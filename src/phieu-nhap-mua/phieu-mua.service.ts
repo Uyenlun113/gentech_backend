@@ -28,21 +28,20 @@ export class phieuMuaService {
         const ma_dvcs = 'CTY';
         const ma_ct = 'PNA';
         const ty_gia = '1';
+        const ngay_ct0 = new Date(hdThue[0]?.ngay_ct0 ?? '');
 
         try {
             // 👉 Giai đoạn 1: xử lý dữ liệu trong transaction
-            await queryRunner.startTransaction();
-
             // 1. CheckExistsHDvao nếu có dữ liệu
-            if (hdThue?.length > 0) {
-                await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
-                    stt_rec,
-                    hdThue[0]?.so_ct0,
-                    hdThue[0]?.so_seri0,
-                    hdThue[0]?.ngay_ct0,
-                    hdThue[0]?.ma_so_thue,
-                ]);
-            }
+            // if (hdThue?.length > 0) {
+            //     await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
+            //         stt_rec,
+            //         hdThue[0]?.so_ct0,
+            //         hdThue[0]?.so_seri0,
+            //         ngay_ct0,
+            //         hdThue[0]?.ma_so_thue,
+            //     ]);
+            // }
 
             // 2. Insert PH71
             await queryRunner.manager.save(Ph71Entity, {
@@ -91,12 +90,9 @@ export class phieuMuaService {
             }));
             await queryRunner.manager.save(Ct71GtEntity, ct71gtWithMeta);
 
-            await queryRunner.commitTransaction(); // ✅ kết thúc transaction
+
         } catch (error) {
-            await queryRunner.rollbackTransaction();
             throw new InternalServerErrorException(error.message);
-        } finally {
-            await queryRunner.release();
         }
 
         // 👉 Giai đoạn 2: gọi các thủ tục yêu cầu Snapshot Isolation (ngoài transaction)

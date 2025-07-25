@@ -33,6 +33,9 @@ export class Ct71Entity {
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     cp_nt: number;
 
+    @Column('numeric', { precision: 16, scale: 2, nullable: true })
+    cp: number;
+
     @Column('varchar', { length: 16, nullable: true })
     tk_vt: string;
 

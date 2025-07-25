@@ -23,9 +23,6 @@ export class Ct73Entity {
     ngay_ct: Date;
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    gia: number;
-
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
     thue_nt: number;
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })

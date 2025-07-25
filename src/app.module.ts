@@ -38,6 +38,7 @@ import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
         encrypt: false,
         trustServerCertificate: true,
         enableArithAbort: true,
+        connectTimeout: 30000,
       },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,

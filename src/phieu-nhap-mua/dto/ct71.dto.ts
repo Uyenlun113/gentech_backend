@@ -36,4 +36,8 @@ export class CreateCt71Dto {
     @IsOptional()
     @IsNumber()
     so_luong?: number;
+
+    @IsOptional()
+    @IsNumber()
+    cp_nt?: number;
 }

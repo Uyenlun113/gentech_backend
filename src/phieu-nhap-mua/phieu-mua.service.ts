@@ -1,6 +1,7 @@
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ct00Entity } from "src/general-accounting/entity/ct00.entity";
+import { formatDateToYYYYMMDD } from "src/type/date";
 import { Between, DataSource, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { CreateFullPh71Dto } from "./dto/create-full.dto";
 import { Ct71Entity } from "./entity/ct71.entity";
@@ -22,26 +23,26 @@ export class phieuMuaService {
     async createFullPhieu(dto: CreateFullPh71Dto) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
-
+        await queryRunner.startTransaction();
         const { phieu, hangHoa, hdThue } = dto;
         const stt_rec = `APNA${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_ct = 'PNA';
         const ty_gia = '1';
-        const ngay_ct0 = new Date(hdThue[0]?.ngay_ct0 ?? '');
-
+        const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+        const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
         try {
-            // 👉 Giai đoạn 1: xử lý dữ liệu trong transaction
+
             // 1. CheckExistsHDvao nếu có dữ liệu
-            // if (hdThue?.length > 0) {
-            //     await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
-            //         stt_rec,
-            //         hdThue[0]?.so_ct0,
-            //         hdThue[0]?.so_seri0,
-            //         ngay_ct0,
-            //         hdThue[0]?.ma_so_thue,
-            //     ]);
-            // }
+            if (hdThue?.length > 0) {
+                await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
+                    stt_rec,
+                    hdThue[0]?.so_ct0,
+                    hdThue[0]?.so_seri0,
+                    ngay_ct0,
+                    hdThue[0]?.ma_so_thue,
+                ]);
+            }
 
             // 2. Insert PH71
             await queryRunner.manager.save(Ph71Entity, {
@@ -75,7 +76,6 @@ export class phieuMuaService {
                 ma_dvcs,
                 ma_ct,
                 ty_gia,
-                cp_nt: phieu.t_cp_nt,
             }));
             await queryRunner.manager.save(Ct71Entity, ct71WithMeta);
 
@@ -90,9 +90,12 @@ export class phieuMuaService {
             }));
             await queryRunner.manager.save(Ct71GtEntity, ct71gtWithMeta);
 
-
+            await queryRunner.commitTransaction();
         } catch (error) {
+            await queryRunner.rollbackTransaction();
             throw new InternalServerErrorException(error.message);
+        } finally {
+            await queryRunner.release();
         }
 
         // 👉 Giai đoạn 2: gọi các thủ tục yêu cầu Snapshot Isolation (ngoài transaction)
@@ -124,6 +127,8 @@ export class phieuMuaService {
             const ma_dvcs = 'CTY';
             const ma_ct = 'PNA';
             const ty_gia = '1';
+            const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+            const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
 
             // 1. Kiểm tra tồn tại
             const existing = await queryRunner.manager.findOne(Ph71Entity, {
@@ -134,13 +139,15 @@ export class phieuMuaService {
             }
 
             // 2. CheckExistsHDvao nếu có
-            // if (hdThue?.length > 0) {
-            //     const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
-            //     await queryRunner.manager.query(
-            //         `EXEC CheckExistsHDvao @0, @1, @2, @3, @4`,
-            //         [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],
-            //     );
-            // }
+            if (hdThue?.length > 0) {
+                await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
+                    stt_rec,
+                    hdThue[0]?.so_ct0,
+                    hdThue[0]?.so_seri0,
+                    ngay_ct0,
+                    hdThue[0]?.ma_so_thue,
+                ]);
+            }
 
             // 3. Update PH71
             await queryRunner.manager.update(

@@ -1,7 +1,8 @@
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ct00Entity } from "src/general-accounting/entity/ct00.entity";
-import { DataSource, ILike, Repository } from "typeorm";
+import { formatDateToYYYYMMDD } from "src/type/date";
+import { Between, DataSource, ILike, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { CreateFullPh71Dto } from "./dto/create-full.dto";
 import { Ct71Entity } from "./entity/ct71.entity";
 import { Ct71GtEntity } from "./entity/ct71gt.entity";
@@ -22,16 +23,15 @@ export class phieuMuaService {
     async createFullPhieu(dto: CreateFullPh71Dto) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
-
+        await queryRunner.startTransaction();
         const { phieu, hangHoa, hdThue } = dto;
         const stt_rec = `APNA${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_ct = 'PNA';
         const ty_gia = '1';
-
+        const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+        const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
         try {
-            // 👉 Giai đoạn 1: xử lý dữ liệu trong transaction
-            await queryRunner.startTransaction();
 
             // 1. CheckExistsHDvao nếu có dữ liệu
             if (hdThue?.length > 0) {
@@ -39,7 +39,7 @@ export class phieuMuaService {
                     stt_rec,
                     hdThue[0]?.so_ct0,
                     hdThue[0]?.so_seri0,
-                    hdThue[0]?.ngay_ct0,
+                    ngay_ct0,
                     hdThue[0]?.ma_so_thue,
                 ]);
             }
@@ -76,7 +76,6 @@ export class phieuMuaService {
                 ma_dvcs,
                 ma_ct,
                 ty_gia,
-                cp_nt: phieu.t_cp_nt,
             }));
             await queryRunner.manager.save(Ct71Entity, ct71WithMeta);
 
@@ -91,7 +90,7 @@ export class phieuMuaService {
             }));
             await queryRunner.manager.save(Ct71GtEntity, ct71gtWithMeta);
 
-            await queryRunner.commitTransaction(); // ✅ kết thúc transaction
+            await queryRunner.commitTransaction();
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw new InternalServerErrorException(error.message);
@@ -128,6 +127,8 @@ export class phieuMuaService {
             const ma_dvcs = 'CTY';
             const ma_ct = 'PNA';
             const ty_gia = '1';
+            const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+            const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
 
             // 1. Kiểm tra tồn tại
             const existing = await queryRunner.manager.findOne(Ph71Entity, {
@@ -139,11 +140,13 @@ export class phieuMuaService {
 
             // 2. CheckExistsHDvao nếu có
             if (hdThue?.length > 0) {
-                const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
-                await queryRunner.manager.query(
-                    `EXEC CheckExistsHDvao @0, @1, @2, @3, @4`,
-                    [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],
-                );
+                await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
+                    stt_rec,
+                    hdThue[0]?.so_ct0,
+                    hdThue[0]?.so_seri0,
+                    ngay_ct0,
+                    hdThue[0]?.ma_so_thue,
+                ]);
             }
 
             // 3. Update PH71
@@ -223,26 +226,38 @@ export class phieuMuaService {
         }
     }
 
-    async getAllPh71(page: number, limit: number, search: string, so_ct?: string, ngay_lct?: string) {
+    async getAllPh71(
+        page: number,
+        limit: number,
+        search: string,
+        so_ct?: string,
+        tu_ngay?: string,
+        den_ngay?: string,
+    ) {
         const skip = (page - 1) * limit;
 
-        const whereCondition: any = [];
+        const where: any = {};
 
-        // Lọc theo search
         if (search) {
-            whereCondition.push(
+            where['$or'] = [
                 { dien_giai: ILike(`%${search}%`) },
                 { ma_kho: ILike(`%${search}%`) },
                 { ong_ba: ILike(`%${search}%`) },
-            );
+            ];
         }
+
         if (so_ct) {
-            whereCondition.push({ so_ct });
+            where.so_ct = so_ct;
         }
-        if (ngay_lct) {
-            whereCondition.push({ ngay_lct: new Date(ngay_lct) });
+
+        if (tu_ngay && den_ngay) {
+            where.ngay_lct = Between(new Date(tu_ngay), new Date(den_ngay));
+        } else if (tu_ngay) {
+            where.ngay_lct = MoreThanOrEqual(new Date(tu_ngay));
+        } else if (den_ngay) {
+            where.ngay_lct = LessThanOrEqual(new Date(den_ngay));
         }
-        const where = whereCondition.length > 0 ? whereCondition : {};
+
         const [data, total] = await this.ph71Repository.findAndCount({
             where,
             relations: ['ct71', 'ct71gt'],

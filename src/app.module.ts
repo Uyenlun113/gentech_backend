@@ -21,6 +21,7 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
+import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
 
 
 @Module({
@@ -37,6 +38,7 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
         encrypt: false,
         trustServerCertificate: true,
         enableArithAbort: true,
+        connectTimeout: 30000,
       },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
@@ -63,6 +65,7 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     chiPhiMuaHangModule,
     DonHangMuaModule,
 
+    HoaDonMuaDVModule,
   ],
 })
 export class AppModule { }

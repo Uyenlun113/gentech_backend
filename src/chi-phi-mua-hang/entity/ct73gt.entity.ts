@@ -56,16 +56,10 @@ export class Ct73GtEntity {
     ma_so_thue: string;
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    t_tien: number;
-
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
     thue_suat: number;
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     han_tt: number;
-
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    t_tt: number;
 
     @Column('varchar', { length: 16, nullable: true })
     tk_thue_no: string;

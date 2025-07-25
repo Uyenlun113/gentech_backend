@@ -85,4 +85,8 @@ export class CreatePh73Dto {
     @Type(() => Date)
     @IsDate()
     ngay_lct: Date;
+
+    @IsOptional()
+    @IsString()
+    ty_gia?: string;
 }

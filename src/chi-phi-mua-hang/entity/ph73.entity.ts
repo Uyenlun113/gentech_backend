@@ -33,9 +33,6 @@ export class Ph73Entity {
     t_tien_nt: number
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    t_tien_nt0: number
-
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_cp_nt: number
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
@@ -60,13 +57,7 @@ export class Ph73Entity {
     ong_ba: string
 
     @Column('varchar', { length: 16, nullable: true })
-    loai_pb: string
-
-    @Column('varchar', { length: 16, nullable: true })
-    ma_kh_i: string
-
-    @Column('varchar', { length: 16, nullable: true })
-    tk_i: string
+    loai_pb: string;
 
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
     ngay_ct: Date;

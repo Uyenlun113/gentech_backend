@@ -134,13 +134,13 @@ export class phieuMuaService {
             }
 
             // 2. CheckExistsHDvao nếu có
-            if (hdThue?.length > 0) {
-                const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
-                await queryRunner.manager.query(
-                    `EXEC CheckExistsHDvao @0, @1, @2, @3, @4`,
-                    [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],
-                );
-            }
+            // if (hdThue?.length > 0) {
+            //     const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
+            //     await queryRunner.manager.query(
+            //         `EXEC CheckExistsHDvao @0, @1, @2, @3, @4`,
+            //         [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],
+            //     );
+            // }
 
             // 3. Update PH71
             await queryRunner.manager.update(

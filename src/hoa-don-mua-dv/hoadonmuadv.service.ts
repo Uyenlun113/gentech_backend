@@ -194,7 +194,7 @@ export class HoaDonMuaDVService {
                             dien_giai0: createDto.dien_giai ?? '',
                             nh_dkc: 'A01',
                         });
-                        await this.ct00Repository.insert(ct00);
+                        await this.ct00Repository.save(ct00);
                         ct00Saved.push(ct00);
                     }
                 }
@@ -205,9 +205,9 @@ export class HoaDonMuaDVService {
             throw new Error('Create ct00 failed: ' + error.message);
         }
 
-        await this.dataSource.query(
-            `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}'`
-        );
+        // await this.dataSource.query(
+        //     `EXEC [dbo].[APCTPN1-Post] @stt_rec = '${stt_rec}'`
+        // );
 
         return { ct31: ct31Saved, ct31gt: ct31gtSaved, ph31: ph31Saved, ct00: ct00Saved };
     }
@@ -440,7 +440,32 @@ export class HoaDonMuaDVService {
                             stt_rec,
                             stt_rec0: rec.stt_rec0,
                             ma_ct: 'PN1',
-                            ngay_ct: updateDto.ngay_ct,
+                            // ngay_ct: updateDto.ngay_ct,
+                            // ngay_lct: updateDto.ngay_lct,
+                            // so_ct: updateDto.so_ct ?? '',
+                            // ong_ba: updateDto.ong_ba ?? '',
+                            // dien_giai: item.dien_giaii ?? '',
+                            // ma_nt: updateDto.ma_nt ?? '',
+                            // ty_gia: updateDto.ty_gia ?? 1,
+                            // ma_kh: updateDto.ma_kh ?? '',
+                            // ma_qs: updateDto.ma_qs ?? '',
+                            // nh_dk: "A01",
+                            // ps_no_nt: 0,
+                            // ps_co_nt: 0,
+                            // ty_gia_ht: 1,
+                            // ty_gia_ht2: 1,
+                            // ps_co: rec.ps_co,
+                            // ps_no: rec.ps_no,
+                            // ct_nxt: 0,
+                            // ma_vv: "",
+                            // // status: '2',
+                            // ma_dvcs: 'CTY',
+                            // so_seri0: "",
+                            // loai_ct: '2',
+                            // dien_giai0: updateDto.dien_giai ?? '',
+                            // nh_dkc: 'A01',
+                            ma_gd: '',
+                            ngay_ct: updateDto.ngay_ct ?? new Date(),
                             ngay_lct: updateDto.ngay_lct,
                             so_ct: updateDto.so_ct ?? '',
                             ong_ba: updateDto.ong_ba ?? '',
@@ -450,22 +475,24 @@ export class HoaDonMuaDVService {
                             ma_kh: updateDto.ma_kh ?? '',
                             ma_qs: updateDto.ma_qs ?? '',
                             nh_dk: "A01",
+                            tk: String(item.tk_vt ?? ''),
+                            tk_du: '',
                             ps_no_nt: 0,
                             ps_co_nt: 0,
                             ty_gia_ht: 1,
                             ty_gia_ht2: 1,
-                            ps_co: rec.ps_co,
-                            ps_no: rec.ps_no,
+                            ps_co: 0,
+                            ps_no: 0,
                             ct_nxt: 0,
                             ma_vv: "",
-                            // status: '2',
+                            status: '2',
                             ma_dvcs: 'CTY',
                             so_seri0: "",
                             loai_ct: '2',
                             dien_giai0: updateDto.dien_giai ?? '',
                             nh_dkc: 'A01',
                         });
-                        await this.ct00Repository.insert(ct00);
+                        let data = await this.ct00Repository.save(ct00);
                         ct00Saved.push(ct00);
                     }
                 }
@@ -475,9 +502,9 @@ export class HoaDonMuaDVService {
         }
 
         // Gọi lại thủ tục post nếu cần
-        await this.dataSource.query(
-            `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}'`
-        );
+        // await this.dataSource.query(
+        //     `EXEC [dbo].[APCTPN1-Post] @stt_rec = '${stt_rec}'`
+        // );
 
         const ph31Updated = await this.ph31Repository.findOneBy({ stt_rec });
 

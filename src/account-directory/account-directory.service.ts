@@ -41,6 +41,7 @@ export class AccountDirectoryService {
             const [data, total] = await queryBuilder
                 .skip((page - 1) * limit)
                 .take(limit)
+                .orderBy('dmtk.tk', 'ASC')
                 .getManyAndCount();
             return {
                 status: HttpStatus.OK,
@@ -78,7 +79,7 @@ export class AccountDirectoryService {
                 EXEC dbo.CheckTKContain @table_name, @new_value, @tk_me, @old_value;
                 `,
                 ['dmtk', dto.tk0, dto.tk_me || '', '']
-              );
+            );
 
             const account = this.accountDirectoryRepository.create({
                 tk: dto.tk0,

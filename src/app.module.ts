@@ -14,6 +14,7 @@ import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
 import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
 import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
+import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { PhieuNhapKhoModule } from './phieu-nhap-kho/phieu-nhap-kho.module';
@@ -21,7 +22,7 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
-import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
+import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
 
 
 @Module({
@@ -64,7 +65,7 @@ import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
     phieuMuaModule,
     chiPhiMuaHangModule,
     DonHangMuaModule,
-
+    DonBanHangModule,
     HoaDonMuaDVModule,
   ],
 })

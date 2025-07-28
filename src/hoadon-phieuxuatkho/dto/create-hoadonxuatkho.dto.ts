@@ -12,82 +12,53 @@ import { Type } from 'class-transformer';
 // DTO cho ct31
 export class HachToanDto {
   @IsString()
-  tk_vt: string;
+  ma_vt: string;
+
+  @IsString()
+  ma_kho_i: string;
+
+  @Type(() => Number)
+  @IsNumber()
+  so_luong: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  gia2?: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  tien2?: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  gia?: number;
 
   @Type(() => Number)
   @IsNumber()
   tien?: number;
 
   @IsString()
-  dien_giaii?: string;
+  tk_dt?: string;
+
+  @IsString()
+  tk_vt?: string;
+
+  @IsString()
+  tk_gv?: string;
 }
-
-// DTO cho ct31gt
-export class HopDongThue {
-  // @Type(() => Number)
-  // @IsNumber()
-  // ma_ms: Number;
-
+// DTO chính cho ph31
+export class CreateHoaDonXuatKhoDto {
   @IsString()
-  so_ct0: string;
-
-  @IsString()
-  so_seri0: string;
-
-  @IsDateString()
-  ngay_ct: Date;
-
-  @Type(() => Number)
-  @IsNumber()
-  thue_suat?: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  t_tien?: number;
-
-  @Type(() => Number)
-  @IsNumber()
-  t_thue?: number;
-
-  @IsString()
-  tk_thue_no: string;
-
-  @IsString()
-  kh_mau_hd: string;
-
-  @IsString()
-  ghi_chu?: string;
-
-  @IsString()
-  ten_vt?: string;
+  ma_gd: string;
 
   @IsString()
   ma_kh: string;
-
-  @IsString()
-  ten_kh: string;
-
-  @IsString()
-  ma_thue: string;
-
-  @IsString()
-  ma_ms: string;
 
   @IsString()
   dia_chi: string;
 
   @IsString()
   ma_so_thue: string;
-
-}
-
-// DTO chính cho ph31
-export class CreateHoaDonMuaDVDto {
-  @IsString()
-  ma_kh: string;
-
-  @IsString()
-  dia_chi: string;
 
   @IsString()
   ong_ba: string;
@@ -97,6 +68,9 @@ export class CreateHoaDonMuaDVDto {
 
   @IsString()
   ma_nx: string;
+
+  @IsString()
+  ma_bp: string;
 
   @IsDateString()
   ngay_ct: Date;
@@ -108,11 +82,15 @@ export class CreateHoaDonMuaDVDto {
   ma_qs: string;
 
   @IsString()
+  so_seri: string;
+
+  @IsString()
   so_ct: string;
 
   @IsString()
   ma_nt: string;
 
+  @Type(() => Number)
   @IsNumber()
   ty_gia: number;
 
@@ -125,9 +103,30 @@ export class CreateHoaDonMuaDVDto {
   @Type(() => HachToanDto)
   hachToanList: HachToanDto[];
 
-  // Array lưu vào ct31gt
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HopDongThue)
-  hopDongThue: HopDongThue[];
+  @Type(() => Number)
+  @IsNumber()
+  sl_in: number;
+
+  @IsString()
+  ma_thue: string;
+
+  @Type(() => Number)
+  @IsNumber()
+  thue_suat: number;
+
+  @IsString()
+  tk_no: string;
+
+  @IsString()
+  tk_co: string;
+
+  @IsString()
+  ten_vtthue: string;
+
+  @IsString()
+  gc_thue: string;
+
+  @IsString()
+  ht_tt: string;
+
 }

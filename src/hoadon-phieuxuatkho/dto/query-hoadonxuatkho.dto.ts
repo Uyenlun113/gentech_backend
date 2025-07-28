@@ -2,7 +2,7 @@
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
-export class QueryHoaDonMuaDVDto {
+export class QueryHoaDonXuatKhoDto {
     @IsOptional()
     @IsString()
     search?: string;

@@ -23,6 +23,7 @@ import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
+import { HoaDonXuatKhoModule } from './hoadon-phieuxuatkho/hoadonxuatkho.module';
 
 
 @Module({
@@ -67,6 +68,7 @@ import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
     DonHangMuaModule,
     DonBanHangModule,
     HoaDonMuaDVModule,
+    HoaDonXuatKhoModule,
   ],
 })
 export class AppModule { }

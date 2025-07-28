@@ -139,7 +139,6 @@ export class DonBanHangService {
             [stt_rec]
         );
 
-
         return { success: true, message: 'Cập nhật phiếu thành công' };
     }
 

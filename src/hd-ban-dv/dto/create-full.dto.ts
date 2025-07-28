@@ -3,16 +3,7 @@ import { IsArray, IsDateString, IsNumber, IsOptional, IsString, ValidateNested }
 
 export class CreateCt21Dto {
     @IsString()
-    stt_rec: string;
-
-    @IsString()
-    ma_ct: string;
-
-    @IsString()
     so_ct: string;
-
-    @IsString()
-    ma_kho_i: string;
 
     @IsOptional()
     @IsString()
@@ -20,9 +11,6 @@ export class CreateCt21Dto {
 
     @IsDateString()
     ngay_ct: Date;
-
-    @IsDateString()
-    han_gh_i: Date;
 
     @IsOptional()
     @IsNumber()
@@ -70,6 +58,14 @@ export class CreateCt21Dto {
 
     @IsOptional()
     @IsString()
+    tk_ck?: string;
+
+    @IsOptional()
+    @IsString()
+    dvt?: string;
+
+    @IsOptional()
+    @IsString()
     dien_giaii?: string;
 
     @IsOptional()
@@ -78,11 +74,6 @@ export class CreateCt21Dto {
 }
 
 export class CreatePh21Dto {
-    @IsString()
-    stt_rec: string;
-
-    @IsString()
-    ma_ct: string;
 
     @IsString()
     ma_kh: string;
@@ -105,10 +96,6 @@ export class CreatePh21Dto {
 
     @IsOptional()
     @IsNumber()
-    t_so_luong?: number;
-
-    @IsOptional()
-    @IsNumber()
     t_tien_nt2?: number;
 
     @IsOptional()
@@ -118,6 +105,10 @@ export class CreatePh21Dto {
     @IsOptional()
     @IsNumber()
     t_tt_nt?: number;
+
+    @IsOptional()
+    @IsNumber()
+    t_ck?: number;
 
     @IsOptional()
     @IsNumber()
@@ -150,12 +141,8 @@ export class CreatePh21Dto {
     ngay_lct: Date;
 
     @IsOptional()
-    @IsString()
-    ty_gia?: string;
-
-    @IsOptional()
-    @IsString()
-    ma_hd_me?: string;
+    @IsNumber()
+    t_tien2?: number;
 
     @IsOptional()
     @IsString()
@@ -168,6 +155,22 @@ export class CreatePh21Dto {
     @IsOptional()
     @IsString()
     so_seri?: string;
+
+    @IsOptional()
+    @IsString()
+    ht_tt?: string;
+
+    @IsNumber()
+    @Type(() => Number)
+    han_tt?: number;
+
+    @IsOptional()
+    @IsString()
+    ten_vtthue?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_thck?: string;
 }
 
 export class CreateFullPh21Dto {
@@ -178,5 +181,5 @@ export class CreateFullPh21Dto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateCt21Dto)
-    chiTiet: CreateCt21Dto[];
+    hangHoa: CreateCt21Dto[];
 }

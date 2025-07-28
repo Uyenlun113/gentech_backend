@@ -10,10 +10,12 @@ import { chiPhiMuaHangModule } from './chi-phi-mua-hang/chi-phi-mua-hang.module'
 import { DmkhoModule } from './dmkho/dmkho.module';
 import { DmsttModule } from './dmstt/dmstt.module';
 import { DmvuviecModule } from './dmvuviec/dmvuviec.module';
+import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
 import { DonHangMuaModule } from './don-hang-mua/donhangmua.module';
 import { GiayBaoCoModule } from './gb-co-nganhang/giaybaoco.module';
 import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
+import { HdBanDvModule } from './hd-ban-dv/hd-ban-dv.module';
 import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
@@ -22,7 +24,6 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
-import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
 
 
 @Module({
@@ -67,6 +68,7 @@ import { DonBanHangModule } from './don-ban-hang/don-ban-hang.module';
     DonHangMuaModule,
     DonBanHangModule,
     HoaDonMuaDVModule,
+    HdBanDvModule
   ],
 })
 export class AppModule { }

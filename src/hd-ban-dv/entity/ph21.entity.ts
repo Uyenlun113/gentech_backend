@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Ct21Entity } from "./ct21.entity";
 
 
 @Entity('ph21')
@@ -23,9 +24,6 @@ export class Ph21Entity {
 
     @Column('varchar', { length: 16, nullable: true })
     ma_qs: string
-
-    @Column('numeric', { precision: 16, scale: 2, nullable: true })
-    t_so_luong: number
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_tien_nt2: number
@@ -60,11 +58,13 @@ export class Ph21Entity {
     @Column({ name: 'ngay_lct', type: 'smalldatetime' })
     ngay_lct: Date;
 
-    @Column({ type: 'varchar', length: 16, nullable: true })
-    ty_gia: string
-
-    @Column({ type: 'varchar', length: 16, nullable: true })
-    ma_hd_me: string
+    @Column({
+        type: 'numeric',
+        precision: 16,
+        scale: 2,
+        nullable: true
+    })
+    ty_gia: number;
 
     @Column({ type: 'varchar', length: 16, nullable: true })
     ma_nx: string
@@ -74,6 +74,26 @@ export class Ph21Entity {
 
     @Column({ type: 'varchar', length: 256, nullable: true })
     so_seri: string
+
+    @Column({ type: 'varchar', length: 256, nullable: true })
+    ht_tt: string
+
+    @Column({ type: 'numeric', precision: 16, scale: 2, nullable: true })
+    han_tt: number;
+
+    @Column({ type: 'numeric', precision: 16, scale: 2, nullable: true })
+    t_ck: number;
+
+    @Column({ type: 'varchar', length: 256, nullable: true })
+    ten_vtthue: string
+
+    @Column({ type: 'varchar', length: 256, nullable: true })
+    ma_thck: string
+
+    @OneToMany(() => Ct21Entity, (ct21) => ct21.ph21)
+    hangHoa: Ct21Entity[];
+
+
 
 
 }

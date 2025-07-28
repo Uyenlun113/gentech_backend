@@ -17,6 +17,7 @@ import { GiayBaoNoModule } from './gb-no-nganhang/giaybaono.module';
 import { GeneralAccountingModule } from './general-accounting/general-accounting.module';
 import { HdBanDvModule } from './hd-ban-dv/hd-ban-dv.module';
 import { HoaDonMuaDVModule } from './hoa-don-mua-dv/hoadonmuadv.module';
+import { HoaDonXuatKhoModule } from './hoadon-phieuxuatkho/hoadonxuatkho.module';
 import { MaterialModule } from './material/material.module';
 import { Ct46AccountingModule } from './phieu-chi/phieu-chi.module';
 import { PhieuNhapKhoModule } from './phieu-nhap-kho/phieu-nhap-kho.module';
@@ -68,7 +69,9 @@ import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt
     DonHangMuaModule,
     DonBanHangModule,
     HoaDonMuaDVModule,
-    HdBanDvModule
+    HdBanDvModule,
+    HoaDonXuatKhoModule,
+
   ],
 })
 export class AppModule { }

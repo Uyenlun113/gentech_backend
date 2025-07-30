@@ -48,7 +48,7 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_dvcs,
                 ma_ct,
-                ngay_ct: new Date(phieu.ngay_ct).toISOString().slice(0, 16).replace("T", " "),
+                ngay_ct: new Date(phieu.ngay_ct),
                 ngay_lct: new Date(phieu.ngay_lct),
                 ty_gia
             });
@@ -57,7 +57,7 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_ct,
                 ma_dvcs,
-                ngay_ct: new Date(phieu.ngay_ct).toISOString().slice(0, 16).replace("T", " "),
+                ngay_ct: new Date(phieu.ngay_ct),
                 so_ct: phieu.so_ct,
                 dien_giai: phieu.dien_giai,
                 ong_ba: phieu.ong_ba,
@@ -82,7 +82,8 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_ct,
                 ma_dvcs,
-                ty_gia
+                ty_gia,
+                ngay_ct0
             }));
             await queryRunner.manager.save(Ct73GtEntity, ct73gtWithMeta);
 

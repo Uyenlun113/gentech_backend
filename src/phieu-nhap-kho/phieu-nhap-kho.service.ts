@@ -7,6 +7,7 @@ import { Ct00 } from '../gb-co-nganhang/entity/ct00.entity'
 import { CreatePhieuNhapKhoDto } from './dto/create-phieunhapkho.dto';
 import { UpdatePhieuNhapKhoDto } from './dto/update-phieunhapkho.dto';
 import { QueryPhieuNhapKhoDto } from './dto/query-phieunhapkho.dto';
+import { Material } from '../material/material.entity';
 
 @Injectable()
 export class PhieuNhapKhoService {
@@ -17,6 +18,8 @@ export class PhieuNhapKhoService {
     private readonly ph74Repository: Repository<Ph74>,
     @InjectRepository(Ct00)
     private readonly ct00Repository: Repository<Ct00>,
+    @InjectRepository(Material)
+    private MaterialRepo: Repository<Material>,
     private readonly dataSource: DataSource
   ) { }
 
@@ -157,16 +160,27 @@ export class PhieuNhapKhoService {
         ph74Records.map(async (ph) => {
           const ct74List = await this.ct74Repository.find({ where: { stt_rec: ph.stt_rec } });
 
-          const hang_hoa_list = ct74List.map((item) => ({
-            ma_vt: item.ma_vt,
-            ma_kho_i: item.ma_kho_i ?? '',
-            ton_kho: item.so_luong ?? 0,
-            so_luong: item.so_luong ?? 0,
-            gia: item.gia ?? 0,
-            tien: item.tien ?? 0,
-            tk_vt: item.tk_vt ?? 0,
-            ma_nx_i: item.ma_nx_i ?? 0,
-          }));
+          const hang_hoa_list = await Promise.all(
+            ct74List.map(async (item) => {
+              const material = await this.MaterialRepo.findOne({
+                where: { ma_vt: item.ma_vt },
+                select: ['ten_vt', 'dvt'],
+              });
+
+              return {
+                ma_vt: item.ma_vt,
+                ten_vt: material?.ten_vt ?? '',
+                dvt: material?.dvt ?? '',
+                ma_kho_i: item.ma_kho_i ?? '',
+                ton_kho: item.so_luong ?? 0,
+                so_luong: item.so_luong ?? 0,
+                gia: item.gia ?? 0,
+                tien: item.tien ?? 0,
+                tk_vt: item.tk_vt ?? 0,
+                ma_nx_i: item.ma_nx_i ?? 0,
+              };
+            })
+          );
 
           const tong_tien = hang_hoa_list.reduce((sum, tk) => sum + (tk.tien || 0), 0);
 

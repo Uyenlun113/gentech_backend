@@ -1,6 +1,7 @@
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Ct00Entity } from "src/general-accounting/entity/ct00.entity";
+import { formatDateToYYYYMMDD } from "src/type/date";
 import { DataSource, ILike, Repository } from "typeorm";
 import { CreateFullPh73Dto } from "./dto/create-full.dto";
 import { Ct73Entity } from "./entity/ct73.entity";
@@ -29,14 +30,15 @@ export class ChiPhiMuaHangService {
         const ma_dvcs = 'CTY';
         const ma_ct = 'PNC';
         const ty_gia = '1';
-
+        const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+        const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
         try {
             if (hdThue?.length > 0) {
                 await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
                     stt_rec,
                     hdThue[0]?.so_ct0,
                     hdThue[0]?.so_seri0,
-                    hdThue[0]?.ngay_ct0,
+                    ngay_ct0,
                     hdThue[0]?.ma_so_thue,
                 ]);
             }

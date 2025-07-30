@@ -72,7 +72,7 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_dvcs,
                 ma_ct,
-                ty_gia
+                ty_gia,
             }));
             await queryRunner.manager.save(Ct73Entity, ct73WithMeta);
 

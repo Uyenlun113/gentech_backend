@@ -13,7 +13,7 @@ export class ChiPhiMuaHangController {
         return this.chiPhiMuaHangService.createFullPhieu(createPhieuDto);
     }
 
-    @Patch('/update/:stt_rec')
+    @Patch(':stt_rec')
     async updateChiPhi(@Body() updatePhieuDto: CreateFullPh73Dto, @Param('stt_rec') stt_rec: string) {
         return this.chiPhiMuaHangService.updateFullPhieu(stt_rec, updatePhieuDto);
     }

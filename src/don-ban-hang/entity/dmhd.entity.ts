@@ -35,6 +35,9 @@ export class DmhdEntity {
     t_thue: number
 
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
+    t_ck: number
+
+    @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_tt_nt: number
 
     @Column('varchar', { length: 16, nullable: true })

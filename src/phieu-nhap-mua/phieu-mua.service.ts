@@ -23,7 +23,7 @@ export class phieuMuaService {
     async createFullPhieu(dto: CreateFullPh71Dto) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
-        await queryRunner.startTransaction();
+
         const { phieu, hangHoa, hdThue } = dto;
         const stt_rec = `APNA${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
@@ -43,7 +43,7 @@ export class phieuMuaService {
                     hdThue[0]?.ma_so_thue,
                 ]);
             }
-
+            await queryRunner.startTransaction();
             // 2. Insert PH71
             await queryRunner.manager.save(Ph71Entity, {
                 ...phieu,
@@ -121,7 +121,7 @@ export class phieuMuaService {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
-        await queryRunner.startTransaction();
+
 
         try {
             const ma_dvcs = 'CTY';
@@ -148,7 +148,7 @@ export class phieuMuaService {
                     hdThue[0]?.ma_so_thue,
                 ]);
             }
-
+            await queryRunner.startTransaction();
             // 3. Update PH71
             await queryRunner.manager.update(
                 Ph71Entity,

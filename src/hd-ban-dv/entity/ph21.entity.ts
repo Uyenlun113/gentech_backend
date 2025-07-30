@@ -10,7 +10,7 @@ export class Ph21Entity {
     @PrimaryColumn('char', { length: 16 })
     ma_ct: string
 
-    @PrimaryColumn('char', { length: 16 })
+    @Column('char', { length: 16 })
     ma_kh: string
 
     @Column('varchar', { length: 128, nullable: true })
@@ -90,7 +90,7 @@ export class Ph21Entity {
     @Column({ type: 'varchar', length: 256, nullable: true })
     ma_thck: string
 
-    @OneToMany(() => Ct21Entity, (ct21) => ct21.ph21)
+    @OneToMany(() => Ct21Entity, ct => ct.ph21)
     hangHoa: Ct21Entity[];
 
 

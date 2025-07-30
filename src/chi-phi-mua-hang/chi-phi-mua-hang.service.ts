@@ -31,8 +31,6 @@ export class ChiPhiMuaHangService {
         const ty_gia = '1';
 
         try {
-
-
             if (hdThue?.length > 0) {
                 await queryRunner.manager.query(`EXEC CheckExistsHDvao @0, @1, @2, @3, @4`, [
                     stt_rec,
@@ -115,7 +113,6 @@ export class ChiPhiMuaHangService {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
-        await queryRunner.startTransaction();
 
         try {
             const ma_dvcs = 'CTY';
@@ -136,7 +133,7 @@ export class ChiPhiMuaHangService {
                     [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],
                 );
             }
-
+            await queryRunner.startTransaction();
             await queryRunner.manager.update(
                 Ph73Entity,
                 { stt_rec, ma_ct, ma_dvcs, ty_gia },

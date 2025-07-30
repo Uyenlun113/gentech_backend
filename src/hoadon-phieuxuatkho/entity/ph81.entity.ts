@@ -9,7 +9,13 @@ export class Ph81 {
   ma_gd: string;
 
   @Column()
+  ma_ct: string;  
+
+  @Column()
   ma_kh: string;
+
+  @Column()
+  ten_kh: string;
 
   @Column()
   dia_chi: string;

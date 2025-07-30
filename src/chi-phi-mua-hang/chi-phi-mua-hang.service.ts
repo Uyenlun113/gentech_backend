@@ -48,7 +48,7 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_dvcs,
                 ma_ct,
-                ngay_ct: new Date(phieu.ngay_ct),
+                ngay_ct: new Date(phieu.ngay_ct).toISOString().slice(0, 16).replace("T", " "),
                 ngay_lct: new Date(phieu.ngay_lct),
                 ty_gia
             });
@@ -57,7 +57,7 @@ export class ChiPhiMuaHangService {
                 stt_rec,
                 ma_ct,
                 ma_dvcs,
-                ngay_ct: new Date(phieu.ngay_ct),
+                ngay_ct: new Date(phieu.ngay_ct).toISOString().slice(0, 16).replace("T", " "),
                 so_ct: phieu.so_ct,
                 dien_giai: phieu.dien_giai,
                 ong_ba: phieu.ong_ba,

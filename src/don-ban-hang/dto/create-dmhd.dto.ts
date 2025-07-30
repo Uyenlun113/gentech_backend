@@ -39,6 +39,10 @@ export class CreateDmhdDto {
 
     @IsOptional()
     @IsNumber()
+    t_ck?: number;
+
+    @IsOptional()
+    @IsNumber()
     t_thue?: number;
 
     @IsOptional()

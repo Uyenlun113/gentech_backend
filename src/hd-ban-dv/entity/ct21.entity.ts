@@ -11,7 +11,7 @@ export class Ct21Entity {
     @PrimaryColumn('char', { length: 16 })
     ma_ct: string;
 
-    @PrimaryColumn('char', { length: 16 })
+    @Column('char', { length: 16 })
     so_ct: string;
 
     @Column({ name: 'ngay_ct', type: 'smalldatetime' })
@@ -63,7 +63,10 @@ export class Ct21Entity {
     so_luong: number;
 
     @ManyToOne(() => Ph21Entity, ph21 => ph21.hangHoa, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
+    @JoinColumn([
+        { name: 'stt_rec', referencedColumnName: 'stt_rec' },
+        { name: 'ma_ct', referencedColumnName: 'ma_ct' }
+    ])
     ph21: Ph21Entity;
 
     @ManyToOne(() => AccountDirectory)

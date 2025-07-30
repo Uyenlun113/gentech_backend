@@ -184,6 +184,7 @@ export class HdBanDvService {
             where: { stt_rec },
             relations: ['hangHoa', 'hangHoa.tkDtInfo'],
         });
+
     }
 
 

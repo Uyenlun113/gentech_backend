@@ -34,6 +34,9 @@ export class Ct73GtEntity {
     @Column('numeric', { precision: 16, scale: 2, nullable: true })
     t_thue: number;
 
+    @Column('numeric', { precision: 16, scale: 2, nullable: true })
+    t_tien: number;
+
     @Column('char', { length: 16, nullable: true })
     so_ct0: string;
 

@@ -240,6 +240,8 @@ export class Ph85Service {
                 ct85.ma_nx_i = item.ct85_ma_nx_i;
                 ct85.ngay_ct = item.ct85_ngay_ct;
                 ct85.so_luong = item.ct85_so_luong;
+                ct85.gia_nt = item.ct85_gia_nt;
+                ct85.tien_nt = item.ct85_tien_nt;
                 return ct85;
             });
 

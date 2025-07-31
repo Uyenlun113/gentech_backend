@@ -26,6 +26,14 @@ export class CreateCt85Dto {
     @IsNumber()
     @IsOptional()
     so_luong?: number;
+
+    @IsNumber()
+    @IsOptional()
+    gia_nt?: number;
+
+    @IsNumber()
+    @IsOptional()
+    tien_nt?: number;
 }
 
 export class CreatePh85Dto {
@@ -80,6 +88,10 @@ export class CreatePh85Dto {
     @IsString()
     @IsOptional()
     hd_lenhdd?: string;
+
+    @IsNumber()
+    @IsOptional()
+    t_tien_nt?: number;
 }
 
 export class CreatePh85DtoWithVatTu {

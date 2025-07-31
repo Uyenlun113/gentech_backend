@@ -27,6 +27,12 @@ export class Ct85Entity {
     @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
     so_luong: number;
 
+    @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
+    gia_nt: number;
+
+    @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
+    tien_nt: number;
+
     @ManyToOne(() => Material, { eager: false })
     @JoinColumn({ name: 'ma_vt', referencedColumnName: 'ma_vt' })
     vatTu: Material;

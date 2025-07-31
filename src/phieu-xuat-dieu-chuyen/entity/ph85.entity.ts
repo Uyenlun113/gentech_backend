@@ -23,6 +23,9 @@ export class Ph85Entity {
     @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
     t_so_luong: number;
 
+    @Column({ type: 'numeric', precision: 13, scale: 3, nullable: true })
+    t_tien_nt: number;
+
     @Column({ type: 'numeric', precision: 19, scale: 12, nullable: true })
     ty_gia: number;
 

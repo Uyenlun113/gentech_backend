@@ -47,4 +47,6 @@ export class Ct73Entity {
     @ManyToOne(() => Ph73Entity, ph73 => ph73.ct73gt, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'stt_rec', referencedColumnName: 'stt_rec' })
     ph73: Ph73Entity;
+    ten_vt?: string;
+    dvt?: string;
 }

@@ -75,8 +75,10 @@ export class HoaDonXuatKhoService {
             let totalT_Thue = totalT_Tien * Number(createDto.thue_suat)
             const ph81 = this.ph81Repository.create({
                 stt_rec: stt_rec,
+                ma_ct: "HDA",
                 ma_gd: createDto.ma_gd,
                 ma_kh: createDto.ma_kh,
+                ten_kh: "",
                 dia_chi: createDto.dia_chi,
                 ma_so_thue: createDto.ma_so_thue,
                 ong_ba: createDto.ong_ba, // Nếu cần lấy từ bảng Customer thì truy vấn thêm
@@ -106,7 +108,7 @@ export class HoaDonXuatKhoService {
             });
             await this.ph81Repository.save(ph81);
             ph81Saved = ph81;
-           
+
         } catch (error) {
             throw new Error('Create ph81 failed: ' + error.message);
         }

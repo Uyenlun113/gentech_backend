@@ -121,7 +121,8 @@ export class ChiPhiMuaHangService {
             const ma_dvcs = 'CTY';
             const ma_ct = 'PNC';
             const ty_gia = '1';
-
+            const ngay_ct0_raw = new Date(hdThue[0]?.ngay_ct0 ?? '');
+            const ngay_ct0 = formatDateToYYYYMMDD(ngay_ct0_raw);
             const existing = await queryRunner.manager.findOne(Ph73Entity, {
                 where: { stt_rec, ma_ct },
             });
@@ -130,7 +131,7 @@ export class ChiPhiMuaHangService {
             }
 
             if (hdThue?.length > 0) {
-                const { so_ct0, so_seri0, ngay_ct0, ma_so_thue } = hdThue[0];
+                const { so_ct0, so_seri0, ma_so_thue } = hdThue[0];
                 await queryRunner.manager.query(
                     `EXEC CheckExistsHDvao @0, @1, @2, @3, @4`,
                     [stt_rec, so_ct0, so_seri0, ngay_ct0, ma_so_thue],

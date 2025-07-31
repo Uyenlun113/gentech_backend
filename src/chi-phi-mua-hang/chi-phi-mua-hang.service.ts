@@ -7,6 +7,7 @@ import { CreateFullPh73Dto } from "./dto/create-full.dto";
 import { Ct73Entity } from "./entity/ct73.entity";
 import { Ct73GtEntity } from "./entity/ct73gt.entity";
 import { Ph73Entity } from "./entity/ph73.entity";
+import { Material } from '../material/material.entity';
 
 export class ChiPhiMuaHangService {
     constructor(
@@ -18,6 +19,8 @@ export class ChiPhiMuaHangService {
         private readonly ct73GtRepository: Repository<Ct73GtEntity>,
         @InjectRepository(Ct00Entity)
         private readonly ct00Repository: Repository<Ct00Entity>,
+        @InjectRepository(Material)
+        private readonly MaterialRepository: Repository<Material>,
         private readonly dataSource: DataSource
     ) { }
 
@@ -226,6 +229,23 @@ export class ChiPhiMuaHangService {
             order: { ngay_ct: 'DESC' },
         });
 
+        // Gắn thêm thông tin vật tư (ten_vt, dvt) cho từng dòng ct73
+        for (const phieu of data) {
+            for (const ct of phieu.ct73) {
+                if (ct.ma_vt) {
+                    const material = await this.MaterialRepository.findOne({
+                        where: { ma_vt: ct.ma_vt },
+                        select: ['ten_vt', 'dvt'],
+                    });
+                    ct.ten_vt = material?.ten_vt ?? '';
+                    ct.dvt = material?.dvt ?? '';
+                } else {
+                    ct.ten_vt = '';
+                    ct.dvt = '';
+                }
+            }
+        }
+
         return {
             data,
             total,
@@ -234,4 +254,5 @@ export class ChiPhiMuaHangService {
             totalPages: Math.ceil(total / limit),
         };
     }
+
 }

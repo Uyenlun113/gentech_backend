@@ -19,7 +19,7 @@ export class BcTienmatTienguiBankService {
             } = dto;
 
             // Tùy theo stored procedure yêu cầu tham số nào
-            const hasGopTk = gop_tk !== undefined;
+            const hasGopTk = gop_tk == '0';
 
             const query = hasGopTk
                 ? `EXEC sp_executesql 

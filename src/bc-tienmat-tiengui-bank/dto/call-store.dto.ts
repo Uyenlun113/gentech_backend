@@ -13,9 +13,8 @@ export class CallStoreDto {
   @IsDateString()
   ngay_ct2: string;
 
-  @IsOptional()
-  @IsInt()
-  gop_tk?: number; // optional
+  @IsString()
+  gop_tk?: string; // optional
 
   @IsString()
   ma_dvcs: string;

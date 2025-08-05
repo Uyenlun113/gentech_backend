@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional, IsDateString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CallStoreDto {
   @IsString()
@@ -18,4 +18,12 @@ export class CallStoreDto {
 
   @IsString()
   ma_dvcs: string;
+
+  @IsString()
+  @IsOptional()
+  OutputInsert?: string;
+
+  @IsInt()
+  @IsOptional()
+  stt_rec?: number;
 }

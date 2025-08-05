@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
+import { BaocaovonbangtienModule } from './bc-tienmat-tiengui-bank/bc-tienmat-tiengui-bank.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { CdtkModule } from './cdtk/cdtk.module';
 import { CdvtModule } from './cdvt/cdvt.module';
@@ -25,7 +26,6 @@ import { phieuMuaModule } from './phieu-nhap-mua/phieu-mua.module';
 import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
-import { BaocaovonbangtienModule } from './bc-tienmat-tiengui-bank/bc-tienmat-tiengui-bank.module';
 
 
 @Module({

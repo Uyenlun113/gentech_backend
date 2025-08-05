@@ -2,7 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
-import { Ct00Entity } from 'src/general-accounting/entity/ct00.entity';
+
+import { Ct00 } from 'src/SupportingDocuments/CashReceipt/entity/ct00.entity';
 import { Ct46Entity } from './entity/ct46.entity';
 import { Ct46gtEntity } from './entity/ct46gt.entity';
 import { Ph46Entity } from './entity/ph46.entity';
@@ -21,19 +22,22 @@ export class Ct46AccountingService {
         @InjectRepository(Ct46gtEntity)
         private readonly ct46gtRepo: Repository<Ct46gtEntity>,
 
-        @InjectRepository(Ct00Entity)
-        private readonly ct00Repo: Repository<Ct00Entity>,
+        @InjectRepository(Ct00)
+        private readonly ct00Repo: Repository<Ct00>,
 
         private readonly dataSource: DataSource
     ) { }
 
     async save(dto: SaveCt46AccountingDto) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
         const { phieu, hachToan, hopDongThue } = dto;
         const stt_rec = `PC1${Date.now()}`.substring(0, 11);
         const ma_dvcs = 'CTY';
         const ma_ct = 'PC1';
         const ngay_ct = new Date(phieu.ngay_lct);
-
+        let ct00Saved: Ct00[] = [];
         try {
             // Step 1: Kiểm tra số chứng từ hợp lệ
             await this.dataSource.query(
@@ -64,6 +68,7 @@ export class Ct46AccountingService {
                         ...ht,
                         stt_rec,
                         ma_ct,
+                        tien_nt: ht.tien
                     }))
                 );
             }
@@ -84,17 +89,7 @@ export class Ct46AccountingService {
                     }))
                 );
             }
-
-            // Step 5: Lưu CT00
-            await this.ct00Repo.save({
-                ma_ct,
-                ma_dvcs,
-                stt_rec,
-                ngay_ct,
-                stt_rec0: "001",
-                ma_kh: validGT[0]?.ma_kh?.trim() || null,
-            });
-
+            await queryRunner.commitTransaction();
             // Step 6: Kiểm tra dữ liệu (CheckData)
             await this.dataSource.query(
                 `EXEC [dbo].[CACTPC1-CheckData] @status = @0, @stt_rec = @1`,
@@ -107,10 +102,46 @@ export class Ct46AccountingService {
                 [stt_rec, ma_ct]
             );
 
+            ct00Saved = [];
+            if (Array.isArray(hachToan) && hachToan.length > 0) {
+                const existingCT00Records = await this.ct00Repo.find({
+                    where: { stt_rec: stt_rec },
+                });
+                for (let i = 0; i < hachToan.length; i++) {
+                    const item = hachToan[i];
+                    const record1Index = i * 2;
+                    const record2Index = i * 2 + 1;
+                    if (existingCT00Records[record1Index]) {
+                        await this.ct00Repo.update(
+                            { id: existingCT00Records[record1Index].id },
+                            {
+                                ps_co: item.tien ?? 0,
+                                ps_no: 0,
+                            }
+                        );
+                        ct00Saved.push(existingCT00Records[record1Index]);
+                    }
+
+                    if (existingCT00Records[record2Index]) {
+                        await this.ct00Repo.update(
+                            { id: existingCT00Records[record2Index].id },
+                            {
+                                ps_co: 0,
+                                ps_no: item.tien ?? 0,
+                            }
+                        );
+                        ct00Saved.push(existingCT00Records[record2Index]);
+                    }
+                }
+            }
+
             return { message: 'Lưu và ghi sổ thành công', stt_rec };
         } catch (error) {
+            await queryRunner.rollbackTransaction();
             console.error('Lỗi trong quá trình lưu CT46:', error);
             throw new BadRequestException(`Lỗi xử lý: ${error.message}`);
+        } finally {
+            await queryRunner.release();
         }
     }
 
@@ -121,8 +152,8 @@ export class Ct46AccountingService {
         await queryRunner.startTransaction();
 
         try {
-            console.log('dto', dto);
             const { phieu, hachToan, hopDongThue } = dto;
+            let ct00Saved: Ct00[] = [];
 
             const existingPh46 = await queryRunner.manager.findOne(this.ph46Repo.target, {
                 where: { stt_rec },
@@ -160,6 +191,7 @@ export class Ct46AccountingService {
                         stt_rec,
                         ma_ct,
                         so_ct: phieu.so_ct,
+                        tien_nt: ht.tien
                     }))
                 );
             }
@@ -182,15 +214,6 @@ export class Ct46AccountingService {
                 );
                 console.log(validHopDongThue);
             }
-
-            // ✅ 7. Cập nhật lại bảng CT00
-            await queryRunner.manager.update(this.ct00Repo.target, { stt_rec }, {
-                ma_ct,
-                ma_kh: validHopDongThue[0]?.ma_kh?.trim() || null,
-                ngay_ct,
-            });
-
-            // ✅ 8. Commit transaction
             await queryRunner.commitTransaction();
 
             // ✅ 9. Gọi thủ tục xử lý cuối
@@ -200,7 +223,38 @@ export class Ct46AccountingService {
             await this.dataSource.query(
                 `EXEC [dbo].[CACTPC1-Post] @stt_rec = '${stt_rec}', @ma_ct = '${ma_ct}'`
             );
+            ct00Saved = [];
+            if (Array.isArray(hachToan) && hachToan.length > 0) {
+                const existingCT00Records = await this.ct00Repo.find({
+                    where: { stt_rec: stt_rec },
+                });
+                for (let i = 0; i < hachToan.length; i++) {
+                    const item = hachToan[i];
+                    const record1Index = i * 2;
+                    const record2Index = i * 2 + 1;
+                    if (existingCT00Records[record1Index]) {
+                        await this.ct00Repo.update(
+                            { id: existingCT00Records[record1Index].id },
+                            {
+                                ps_co: item.tien ?? 0,
+                                ps_no: 0,
+                            }
+                        );
+                        ct00Saved.push(existingCT00Records[record1Index]);
+                    }
 
+                    if (existingCT00Records[record2Index]) {
+                        await this.ct00Repo.update(
+                            { id: existingCT00Records[record2Index].id },
+                            {
+                                ps_co: 0,
+                                ps_no: item.tien ?? 0,
+                            }
+                        );
+                        ct00Saved.push(existingCT00Records[record2Index]);
+                    }
+                }
+            }
             return { message: 'Cập nhật thành công', stt_rec };
         } catch (err) {
             await queryRunner.rollbackTransaction();

@@ -166,7 +166,6 @@ class HachToanCt46Dto {
     @Type(() => Date)
     ngay_ct?: Date;
 
-    @IsOptional()
     @Transform(({ value }) => {
         if (value === null || value === undefined || value === '') return 0;
         return typeof value === 'string' ? parseFloat(value) : value;

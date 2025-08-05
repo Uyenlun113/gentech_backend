@@ -16,12 +16,14 @@ export class BcTienmatTienguiBankService {
         if (gop_tk == '0') {
             request.input('gop_tk', sql.Int, Number(gop_tk));
             const result = await request.execute(store);
+            console.log(result);
             return {
                 data: result.recordsets[0],
                 totals: result.recordsets[1],
             };
         } else {
             const result = await request.execute(store);
+            console.log(result);
             return {
                 data: result.recordsets[0],
                 totals: result.recordsets[1],

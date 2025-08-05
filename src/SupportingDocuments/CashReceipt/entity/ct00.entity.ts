@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('ct00') // tên bảng trong database
 export class Ct00 {
@@ -59,11 +59,11 @@ export class Ct00 {
   @Column({ type: 'decimal', precision: 18, scale: 6, nullable: true })
   ty_gia_ht2: number;
 
-  @Column({ type: 'decimal', precision: 18, scale: 2, nullable: true })
-  ps_no: number;
-
-  @Column({ type: 'decimal', precision: 18, scale: 2, nullable: true })
+  @Column({ name: 'ps_co', type: 'numeric', precision: 18, scale: 2 })
   ps_co: number;
+
+  @Column({ name: 'ps_no', type: 'numeric', precision: 18, scale: 2 })
+  ps_no: number;
 
   @Column({ nullable: true })
   ma_kh: string;

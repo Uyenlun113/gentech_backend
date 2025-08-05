@@ -29,6 +29,9 @@ export class Ct46Entity {
     @Column({ name: 'tien', type: 'numeric', precision: 16, scale: 2, nullable: true })
     tien: number;
 
+    @Column({ name: 'tien_nt', type: 'numeric', precision: 16, scale: 2, nullable: true })
+    tien_nt: number;
+
     @Column({ name: 'thue_suat', type: 'numeric', precision: 6, scale: 2, nullable: true })
     thue_suat: number;
 

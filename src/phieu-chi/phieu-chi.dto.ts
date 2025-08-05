@@ -154,7 +154,7 @@ class HachToanCt46Dto {
     @IsString()
     tk_i: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     so_ct0: string;
 

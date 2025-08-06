@@ -112,8 +112,8 @@ export class CashReceiptService {
                     const item = createDto.tai_khoan_list[i];
                     // Tạo 2 bản ghi: 1 bản ghi có ps_co, 1 bản ghi có ps_no
                     const records = [
-                        { ps_co: item.ps_co ?? 0, ps_no: 0, stt_rec0: ((i * 2) + 1).toString().padStart(3, '0') },
-                        { ps_co: 0, ps_no: item.ps_co ?? 0, stt_rec0: ((i * 2) + 2).toString().padStart(3, '0') }
+                        { ps_co: 0, ps_no: item.ps_co ?? 0, stt_rec0: ((i * 2) + 2).toString().padStart(3, '0') },
+                        { ps_co: item.ps_co ?? 0, ps_no: 0, stt_rec0: ((i * 2) + 1).toString().padStart(3, '0') }   
                     ];
                     for (const rec of records) {
                         const ct00 = this.ct00Repository.create({
@@ -316,8 +316,8 @@ export class CashReceiptService {
                 for (let i = 0; i < updateDto.tai_khoan_list.length; i++) {
                     const item = updateDto.tai_khoan_list[i];
                     const records = [
-                        { ps_co: item.ps_co ?? 0, ps_no: 0, stt_rec0: ((i * 2) + 1).toString().padStart(3, '0') },
                         { ps_co: 0, ps_no: item.ps_co ?? 0, stt_rec0: ((i * 2) + 2).toString().padStart(3, '0') },
+                        { ps_co: item.ps_co ?? 0, ps_no: 0, stt_rec0: ((i * 2) + 1).toString().padStart(3, '0') }
                     ];
 
                     for (const rec of records) {

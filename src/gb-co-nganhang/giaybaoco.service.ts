@@ -393,7 +393,7 @@ export class GiayBaoCoService {
     /**
      * Sinh mã stt_rec mới, đảm bảo không trùng trong bảng ph51
      */
-    async generateUniqueSttRec(prefix = 'APT'): Promise<string> {
+    async generateUniqueSttRec(prefix = 'ABC1'): Promise<string> {
         try {
             const last = await this.ph51Repository.createQueryBuilder('ph51')
                 .where("ph51.stt_rec LIKE :prefix", { prefix: `${prefix}%` })
@@ -408,7 +408,7 @@ export class GiayBaoCoService {
             let stt_rec: string;
             let isExist = true;
             do {
-                stt_rec = `${prefix}${nextNumber.toString().padStart(8, '0')}`;
+                stt_rec = `${prefix}${nextNumber.toString().padStart(7, '0')}`;
                 const found = await this.ph51Repository.findOneBy({ stt_rec });
                 isExist = !!found;
                 if (isExist) nextNumber++;

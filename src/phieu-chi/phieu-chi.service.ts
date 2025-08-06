@@ -115,8 +115,8 @@ export class Ct46AccountingService {
                         await this.ct00Repo.update(
                             { id: existingCT00Records[record1Index].id },
                             {
-                                ps_co: item.tien ?? 0,
-                                ps_no: 0,
+                                ps_co: 0,
+                                ps_no: item.tien ?? 0,
                             }
                         );
                         ct00Saved.push(existingCT00Records[record1Index]);
@@ -126,8 +126,8 @@ export class Ct46AccountingService {
                         await this.ct00Repo.update(
                             { id: existingCT00Records[record2Index].id },
                             {
-                                ps_co: 0,
-                                ps_no: item.tien ?? 0,
+                                ps_co: item.tien ?? 0,
+                                ps_no: 0
                             }
                         );
                         ct00Saved.push(existingCT00Records[record2Index]);
@@ -236,8 +236,8 @@ export class Ct46AccountingService {
                         await this.ct00Repo.update(
                             { id: existingCT00Records[record1Index].id },
                             {
-                                ps_co: item.tien ?? 0,
-                                ps_no: 0,
+                                ps_co: 0,
+                                ps_no: item.tien ?? 0,
                             }
                         );
                         ct00Saved.push(existingCT00Records[record1Index]);
@@ -247,8 +247,8 @@ export class Ct46AccountingService {
                         await this.ct00Repo.update(
                             { id: existingCT00Records[record2Index].id },
                             {
-                                ps_co: 0,
-                                ps_no: item.tien ?? 0,
+                                ps_co: item.tien ?? 0,
+                                ps_no: 0,
                             }
                         );
                         ct00Saved.push(existingCT00Records[record2Index]);

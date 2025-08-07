@@ -91,4 +91,10 @@ export class Ph81 {
 
   @Column()
   t_tt: number;
+
+  @Column({ nullable: true })
+  sua_tien: number;
+
+  @Column()
+  px_gia_dd: number;
 }

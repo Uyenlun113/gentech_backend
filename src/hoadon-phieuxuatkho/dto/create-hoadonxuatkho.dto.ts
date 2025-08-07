@@ -1,13 +1,12 @@
+import { Type } from 'class-transformer';
 import {
-  IsString,
-  IsNotEmpty,
+  IsArray,
   IsDateString,
   IsNumber,
-  IsArray,
-  ValidateNested,
-  IsDefined
+  IsOptional,
+  IsString,
+  ValidateNested
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 // DTO cho ct31
 export class HachToanDto {
@@ -29,9 +28,11 @@ export class HachToanDto {
   @IsNumber()
   tien2?: number;
 
-  @Type(() => Number)
-  @IsNumber()
+  @IsOptional()
   gia?: number;
+
+  @IsOptional()
+  gia_nt?: number;
 
   @Type(() => Number)
   @IsNumber()
@@ -128,5 +129,11 @@ export class CreateHoaDonXuatKhoDto {
 
   @IsString()
   ht_tt: string;
+
+  @IsOptional()
+  sua_tien?: number;
+
+  @IsOptional()
+  px_gia_dd?: number;
 
 }

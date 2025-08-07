@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ph84')
 export class Ph84 {
@@ -53,9 +53,6 @@ export class Ph84 {
   @Column()
   time: string;
 
-  // @Column()
-  // user_id: string;
-
   @Column({ type: 'datetime' })
   date0: Date;
 
@@ -68,8 +65,11 @@ export class Ph84 {
   @Column()
   status: string;
 
-  // @Column({ type: 'float', nullable: true })
-  // sua_tien: number;
+  @Column({ nullable: true })
+  sua_tien: number;
+
+  @Column()
+  px_gia_dd: number;
 
   @Column()
   ma_dvcs: string;

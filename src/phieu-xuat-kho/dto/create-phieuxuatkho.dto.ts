@@ -1,13 +1,14 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsDateString,
-  IsNumber,
-  IsArray,
-  ValidateNested,
-  IsDefined
-} from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsDateString,
+  IsDefined,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested
+} from 'class-validator';
 
 // DTO cho từng item trong array
 export class PhieuXuatKhoItemDto {
@@ -87,6 +88,12 @@ export class CreatePhieuXuatKhoDto {
   @IsString()
   @IsNotEmpty()
   loai_ct: string;
+
+  @IsOptional()
+  sua_tien?: number;
+
+  @IsOptional()
+  px_gia_dd?: number;
 
   @IsArray()
   @ValidateNested({ each: true })

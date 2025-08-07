@@ -34,6 +34,9 @@ export class CreateMaterialDto {
     nh_vt2?: string;
 
     @IsOptional()
+    gia_ton?: number;
+
+    @IsOptional()
     nh_vt3?: string;
 
     @IsOptional()

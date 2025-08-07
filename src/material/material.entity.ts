@@ -47,6 +47,9 @@ export class Material {
     @Column({ name: 'sl_max', type: 'numeric', precision: 13, scale: 3, nullable: true })
     sl_max: number;
 
+    @Column({ name: 'gia_ton', type: 'numeric', precision: 13, scale: 3, nullable: true })
+    gia_ton: number;
+
     @Column({ name: 'date', type: 'smalldatetime', nullable: true })
     date: Date;
 
@@ -76,6 +79,6 @@ export class Material {
 
     @Column({ name: 'status', type: 'varchar', length: 1, nullable: true, default: 'A' })
     status: string;
-    
+
 
 }

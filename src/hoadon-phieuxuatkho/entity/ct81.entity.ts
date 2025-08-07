@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ct81')
 export class Ct81 {
@@ -25,6 +25,12 @@ export class Ct81 {
 
   @Column('float', { nullable: true })
   gia: number;
+
+  @Column('float', { nullable: true })
+  gia_nt: number;
+
+  @Column('float', { nullable: true })
+  gia_nt2: number;
 
   @Column('float', { nullable: true })
   tien: number;

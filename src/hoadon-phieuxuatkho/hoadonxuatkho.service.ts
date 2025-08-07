@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Ct81 } from './entity/ct81.entity';
-import { Ph81 } from './entity/ph81.entity';
 import { Customer } from '../category-customer/customer.entity';
-import { Material } from '../material/material.entity';
 import { Ct00 } from '../gb-co-nganhang/entity/ct00.entity';
+import { Material } from '../material/material.entity';
 import { CreateHoaDonXuatKhoDto, HachToanDto } from './dto/create-hoadonxuatkho.dto';
-import { UpdateHoaDonXuatKhoDto } from './dto/update-hoadonxuatkho.dto';
 import { QueryHoaDonXuatKhoDto } from './dto/query-hoadonxuatkho.dto';
-import { Ct70 } from './entity/ct70.entity';
+import { UpdateHoaDonXuatKhoDto } from './dto/update-hoadonxuatkho.dto';
+import { Ct81 } from './entity/ct81.entity';
 import { Ctgt20 } from './entity/ctgt20.entity';
+import { Ph81 } from './entity/ph81.entity';
 
 @Injectable()
 export class HoaDonXuatKhoService {
@@ -104,6 +103,8 @@ export class HoaDonXuatKhoService {
                 t_tien: totalT_Tien,
                 t_thue: totalT_Thue,
                 t_tt: totalT_Tien + totalT_Thue,//t_tien+t_thue
+                sua_tien: createDto.sua_tien,
+                px_gia_dd: createDto.px_gia_dd,
 
             });
             await this.ph81Repository.save(ph81);
@@ -195,6 +196,8 @@ export class HoaDonXuatKhoService {
                         t_tien: ph.t_tien,
                         t_thue: ph.t_thue,
                         t_tt: ph.t_tt,
+                        sua_tien: ph.sua_tien,
+                        px_gia_dd: ph.px_gia_dd
                     };
                 })
             );
@@ -262,6 +265,8 @@ export class HoaDonXuatKhoService {
                 ten_vtthue: updateDto.ten_vtthue,
                 gc_thue: updateDto.gc_thue,
                 ht_tt: updateDto.ht_tt,
+                sua_tien: updateDto.sua_tien,
+                px_gia_dd: updateDto.px_gia_dd
             });
             ph81Saved = await this.ph81Repository.findOneBy({ stt_rec });
         } catch (error) {
@@ -281,11 +286,13 @@ export class HoaDonXuatKhoService {
                         so_luong: item.so_luong,
                         gia2: item.gia2,
                         tien2: item.tien2,
-                        gia: item.gia,
+                        gia: item.gia_nt,
                         tien: item.tien,
                         tk_dt: item.tk_dt,
                         tk_vt: item.tk_vt,
                         tk_gv: item.tk_gv,
+                        gia_nt: item.gia_nt,
+                        gia_nt2: item.gia2
                     });
                     await this.HoaDonXuatKhoRepository.save(ct81);
                     ct81Saved.push(ct81);

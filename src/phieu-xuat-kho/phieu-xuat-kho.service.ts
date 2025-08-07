@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { Ct00 } from '../gb-co-nganhang/entity/ct00.entity';
+import { CreatePhieuXuatKhoDto } from './dto/create-phieuxuatkho.dto';
+import { QueryPhieuXuatKhoDto } from './dto/query-phieuxuatkho.dto';
+import { UpdatePhieuXuatKhoDto } from './dto/update-phieuxuatkho.dto';
 import { Ct84 } from './entity/ct84.entity';
 import { Ph84 } from './entity/ph84.entity';
-import { Ct00 } from '../gb-co-nganhang/entity/ct00.entity'
-import { CreatePhieuXuatKhoDto } from './dto/create-phieuxuatkho.dto';
-import { UpdatePhieuXuatKhoDto } from './dto/update-phieuxuatkho.dto';
-import { QueryPhieuXuatKhoDto } from './dto/query-phieuxuatkho.dto';
 
 @Injectable()
 export class PhieuXuatKhoService {
@@ -60,6 +60,8 @@ export class PhieuXuatKhoService {
         ma_qs: createDto.ma_qs ?? '',
         ty_giaf: createDto.ty_gia ?? 1,
         hd_thue: '0',
+        sua_tien: createDto.sua_tien ?? 0,
+        px_gia_dd: createDto.px_gia_dd ?? 0
       });
       await this.ph84Repository.insert(ph84);
       ph84Saved = ph84;
@@ -201,6 +203,8 @@ export class PhieuXuatKhoService {
             ty_gia: ph.ty_gia,
             time: ph.time,
             date: ph.date,
+            sua_tien: ph.sua_tien,
+            px_gia_dd: ph.px_gia_dd,
             ma_dvcs: ph.ma_dvcs,
             hang_hoa_list,
             tong_tien,
@@ -265,6 +269,8 @@ export class PhieuXuatKhoService {
         ma_qs: updateDto.ma_qs ?? '',
         ty_giaf: updateDto.ty_gia ?? 1,
         hd_thue: '0',
+        sua_tien: updateDto.sua_tien ?? 0,
+        px_gia_dd: updateDto.px_gia_dd ?? 0
       });
 
       const ph84 = await this.ph84Repository.findOneBy({ stt_rec });

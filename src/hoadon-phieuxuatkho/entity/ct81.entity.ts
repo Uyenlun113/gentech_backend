@@ -43,4 +43,7 @@ export class Ct81 {
 
   @Column()
   tk_gv: string;
+  
+  @Column()
+  ma_ct: string;  
 }

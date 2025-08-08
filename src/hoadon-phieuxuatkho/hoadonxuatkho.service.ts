@@ -61,10 +61,11 @@ export class HoaDonXuatKhoService {
                             tk_dt: item.tk_dt,
                             tk_vt: item.tk_vt,
                             tk_gv: item.tk_gv,
+                            ma_ct: "HDA",
                         });
                         totalT_Tien += item.tien ?? 0;
                         totalSoLuong += item.so_luong
-                        await this.HoaDonXuatKhoRepository.save(ct81);
+                        await this.HoaDonXuatKhoRepository.insert(ct81);
                         ct81Saved.push(ct81);
                     }
                 }
@@ -242,6 +243,7 @@ export class HoaDonXuatKhoService {
 
             // Cập nhật PH81
             await this.ph81Repository.update({ stt_rec }, {
+                ma_ct: "HDA",
                 ma_gd: updateDto.ma_gd,
                 ma_kh: updateDto.ma_kh,
                 dia_chi: updateDto.dia_chi,
@@ -279,6 +281,7 @@ export class HoaDonXuatKhoService {
                 for (let i = 0; i < updateDto.hachToanList.length; i++) {
                     const item = updateDto.hachToanList[i];
                     const ct81 = this.HoaDonXuatKhoRepository.create({
+                        ma_ct: "HDA",
                         stt_rec,
                         stt_rec0: (i + 1).toString().padStart(3, '0'),
                         ma_vt: item.ma_vt,
@@ -294,7 +297,7 @@ export class HoaDonXuatKhoService {
                         gia_nt: item.gia_nt,
                         gia_nt2: item.gia2
                     });
-                    await this.HoaDonXuatKhoRepository.save(ct81);
+                    await this.HoaDonXuatKhoRepository.insert(ct81);
                     ct81Saved.push(ct81);
                 }
             }
@@ -303,7 +306,9 @@ export class HoaDonXuatKhoService {
         }
 
         // Nếu cần cập nhật ct00 thì bổ sung logic tương tự
-
+        await this.dataSource.query(
+            `EXEC [dbo].[SOCTHDA-Post] @stt_rec = '${stt_rec}' ,@IsHasPT1 = 0`
+        );
         return {
             ct81: ct81Saved,
             ph81: ph81Saved,

@@ -1,15 +1,14 @@
-import { Controller, Post, Put, Body, Param, Get, Query, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { fullDto } from './dto/create-hoadonxuatkho.dto';
 import { HoaDonXuatKhoService } from './hoadonxuatkho.service';
-import { CreateHoaDonXuatKhoDto } from './dto/create-hoadonxuatkho.dto';
-import { UpdateHoaDonXuatKhoDto } from './dto/update-hoadonxuatkho.dto';
 
 @Controller('hoadonxuatkho')
 export class HoaDonXuatKhoController {
-  constructor(private readonly HoaDonXuatKhoService: HoaDonXuatKhoService) {}
+  constructor(private readonly HoaDonXuatKhoService: HoaDonXuatKhoService) { }
 
 
   @Post()
-  async create(@Body() dto: CreateHoaDonXuatKhoDto) {
+  async create(@Body() dto: fullDto) {
     return this.HoaDonXuatKhoService.create(dto);
   }
 
@@ -19,7 +18,7 @@ export class HoaDonXuatKhoController {
   }
 
   @Put(':stt_rec')
-  async update(@Param('stt_rec') stt_rec: string, @Body() dto: UpdateHoaDonXuatKhoDto) {
+  async update(@Param('stt_rec') stt_rec: string, @Body() dto: fullDto) {
     return this.HoaDonXuatKhoService.update(stt_rec, dto);
   }
 

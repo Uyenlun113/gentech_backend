@@ -5,6 +5,13 @@ export class Ct81 {
   @Column()
   stt_rec: string;
 
+  @Column()
+  so_ct: string;
+
+  @Column({ type: 'date' })
+  ngay_ct: Date;
+
+
   @PrimaryColumn()
   stt_rec0: string;
 
@@ -43,7 +50,7 @@ export class Ct81 {
 
   @Column()
   tk_gv: string;
-  
+
   @Column()
-  ma_ct: string;  
+  ma_ct: string;
 }

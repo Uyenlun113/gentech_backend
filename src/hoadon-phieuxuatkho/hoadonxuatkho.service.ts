@@ -4,11 +4,10 @@ import { DataSource, Repository } from 'typeorm';
 import { Customer } from '../category-customer/customer.entity';
 import { Ct00 } from '../gb-co-nganhang/entity/ct00.entity';
 import { Material } from '../material/material.entity';
-import { CreateHoaDonXuatKhoDto, HachToanDto } from './dto/create-hoadonxuatkho.dto';
+import { CreateHoaDonXuatKhoDto, fullDto } from './dto/create-hoadonxuatkho.dto';
 import { QueryHoaDonXuatKhoDto } from './dto/query-hoadonxuatkho.dto';
-import { UpdateHoaDonXuatKhoDto } from './dto/update-hoadonxuatkho.dto';
+import { Ct70 } from './entity/ct70.entity';
 import { Ct81 } from './entity/ct81.entity';
-import { Ctgt20 } from './entity/ctgt20.entity';
 import { Ph81 } from './entity/ph81.entity';
 
 @Injectable()
@@ -25,102 +24,90 @@ export class HoaDonXuatKhoService {
         private readonly CustomerRepository: Repository<Customer>,
         @InjectRepository(Material)
         private readonly MaterialRepository: Repository<Material>,
-        @InjectRepository(Ctgt20)
-        private readonly ctgt20Repository: Repository<Ctgt20>,
+        @InjectRepository(Ct70)
+        private readonly ct70Repository: Repository<Ct70>,
     ) { }
 
-    async create(createDto: CreateHoaDonXuatKhoDto): Promise<{ ct81: Ct81[]; ph81: Ph81; ct00: Ct00[] }> {
+    async create(createDto: fullDto) {
+        const { phieu, hangHoa } = createDto;
+        const ma_ct = 'HDA';
+        const ma_dvcs = 'CTY';
         const stt_rec = await this.generateUniqueSttRec();
-        let ph81Saved: Ph81 | null = null;
-        let ct81Saved: Ct81[] = [];
-        let ct00Saved: Ct00[] = [];
+
+        // 1. Check số chứng từ hợp lệ
+        await this.dataSource.query(
+            `EXEC [dbo].[CheckValidSoCt#3] @ma_qs = @0, @so_ct = @1`,
+            [phieu.ma_qs, phieu.so_ct]
+        );
+
+        // 2. Transaction
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
         try {
-            // await this.dataSource.query(
-            //     `EXEC CheckValidSoct @Ma_qs = @0, @So_ct = @1, @Stt_rec = @2`,
-            //     ["BC1", createDto.so_ct, stt_rec]
-            // );
-            let totalT_Tien = 0
-            let totalSoLuong = 0
-            // Tạo bản ghi PH81
-            try {
-                // Tạo bản ghi CT81
-                if (Array.isArray(createDto.hachToanList) && createDto.hachToanList.length > 0) {
-                    for (let i = 0; i < createDto.hachToanList.length; i++) {
-                        const item: HachToanDto = createDto.hachToanList[i];
-                        const ct81 = this.HoaDonXuatKhoRepository.create({
-                            stt_rec,
-                            stt_rec0: (i + 1).toString().padStart(3, '0'),
-                            ma_vt: item.ma_vt,
-                            ma_kho_i: item.ma_kho_i,
-                            so_luong: item.so_luong,
-                            gia2: item.gia2,
-                            tien2: item.tien2,
-                            gia: item.gia,
-                            tien: item.tien,
-                            tk_dt: item.tk_dt,
-                            tk_vt: item.tk_vt,
-                            tk_gv: item.tk_gv,
-                            ma_ct: "HDA",
-                        });
-                        totalT_Tien += item.tien ?? 0;
-                        totalSoLuong += item.so_luong
-                        await this.HoaDonXuatKhoRepository.insert(ct81);
-                        ct81Saved.push(ct81);
-                    }
-                }
-            } catch (error) {
-                throw new Error('Create ct81 failed: ' + error.message);
-            }
-            let totalT_Thue = totalT_Tien * Number(createDto.thue_suat)
-            const ph81 = this.ph81Repository.create({
-                stt_rec: stt_rec,
-                ma_ct: "HDA",
-                ma_gd: createDto.ma_gd,
-                ma_kh: createDto.ma_kh,
-                ten_kh: "",
-                dia_chi: createDto.dia_chi,
-                ma_so_thue: createDto.ma_so_thue,
-                ong_ba: createDto.ong_ba, // Nếu cần lấy từ bảng Customer thì truy vấn thêm
-                dien_giai: createDto.dien_giai,
-                ma_nx: createDto.ma_nx,
-                ma_bp: createDto.ma_bp,
-                ngay_ct: createDto.ngay_ct,
-                ngay_lct: createDto.ngay_lct,
-                ma_qs: createDto.ma_qs,
-                so_seri: createDto.so_seri,
-                so_ct: createDto.so_ct,
-                ma_nt: createDto.ma_nt,
-                ty_gia: createDto.ty_gia,
-                sl_in: createDto.sl_in,
-                ma_thue: createDto.ma_thue,
-                thue_suat: createDto.thue_suat,
-                tk_thue_no: createDto.tk_no,
-                tk_thue_co: createDto.tk_co,
-                t_so_luong: totalSoLuong, // Nếu cần tổng số lượng thì tính từ hachToanList
-                ten_vtthue: createDto.ten_vtthue,
-                gc_thue: createDto.gc_thue,
-                ht_tt: createDto.ht_tt,
+            // Tổng tiền và tổng số lượng
+            let totalT_Tien = 0;
+            let totalSoLuong = 0;
+            hangHoa.forEach(item => {
+                totalT_Tien += item.tien ?? 0;
+                totalSoLuong += item.so_luong ?? 0;
+            });
+            const totalT_Thue = totalT_Tien * Number(phieu.thue_suat ?? 0);
+
+            // 3. Lưu PH81
+            await queryRunner.manager.save(this.ph81Repository.create({
+                ...phieu,
+                stt_rec,
+                ma_ct,
+                ma_dvcs,
+                ty_gia: 1,
+                t_so_luong: totalSoLuong,
                 t_tien: totalT_Tien,
                 t_thue: totalT_Thue,
-                t_tt: totalT_Tien + totalT_Thue,//t_tien+t_thue
-                sua_tien: createDto.sua_tien,
-                px_gia_dd: createDto.px_gia_dd,
+                t_tt: totalT_Tien + totalT_Thue,
+                t_tien_nt2: totalT_Tien,
+                t_tien2: totalT_Tien,
+                t_tt_nt: totalT_Tien + totalT_Thue,
+                tk_thue_no: phieu.ma_nx
+            }));
 
-            });
-            await this.ph81Repository.save(ph81);
-            ph81Saved = ph81;
+            // 4. Lưu CT81
+            const chiTietEntities = hangHoa.map((item, index) =>
+                this.HoaDonXuatKhoRepository.create({
+                    ...item,
+                    stt_rec,
+                    ma_ct,
+                    so_ct: phieu.so_ct,
+                    ngay_ct: phieu.ngay_ct,
+                })
+            );
+            await queryRunner.manager.save(chiTietEntities);
 
-        } catch (error) {
-            throw new Error('Create ph81 failed: ' + error.message);
+            // 5. Commit transaction
+            await queryRunner.commitTransaction();
+
+        } catch (err) {
+            if (queryRunner.isTransactionActive) {
+                await queryRunner.rollbackTransaction();
+            }
+            throw err;
+        } finally {
+            await queryRunner.release();
         }
 
-
-        // Nếu cần tạo ct00 thì bổ sung logic tương tự
+        // 6. Gọi các stored procedure check và post
         await this.dataSource.query(
-            `EXEC [dbo].[SOCTHDA-Post] @stt_rec = '${stt_rec}' ,@IsHasPT1 = 0`
+            `EXEC [dbo].[SOCTHDA-CheckData] @status = @0, @mode = @1, @stt_rec = @2`,
+            ['2', 0, stt_rec]
         );
-        return { ct81: ct81Saved, ph81: ph81Saved, ct00: ct00Saved };
+
+        await this.dataSource.query(
+            `EXEC [dbo].[SOCTHDA-Post] @stt_rec = @0, @Ap_gia = @1, @IsHasPT1 = @2`,
+            [stt_rec, 0, 0]
+        );
+
+        return { success: true, message: 'Tạo phiếu HDA thành công', stt_rec };
     }
     async findAll(query: QueryHoaDonXuatKhoDto): Promise<{
         data: CreateHoaDonXuatKhoDto[];
@@ -187,8 +174,7 @@ export class HoaDonXuatKhoService {
                         sl_in: ph.sl_in,
                         ma_thue: ph.ma_thue,
                         thue_suat: ph.thue_suat,
-                        tk_no: ph.tk_thue_no,
-                        tk_co: ph.tk_thue_co,
+                        tk_thue_co: ph.tk_thue_co,
                         ten_vtthue: ph.ten_vtthue,
                         gc_thue: ph.gc_thue,
                         ht_tt: ph.ht_tt,
@@ -232,95 +218,100 @@ export class HoaDonXuatKhoService {
         }
     }
 
-    async update(stt_rec: string, updateDto: UpdateHoaDonXuatKhoDto): Promise<{ ct81: Ct81[]; ph81: Ph81 | null; ct00: Ct00[] }> {
-        let ph81Saved: Ph81 | null = null;
-        let ct81Saved: Ct81[] = [];
-        let ct00Saved: Ct00[] = [];
-        try {
-            // Xoá dữ liệu cũ
-            await this.ct00Repository.delete({ stt_rec });
-            await this.HoaDonXuatKhoRepository.delete({ stt_rec });
+    async update(stt_rec: string, updateDto: fullDto) {
+        const { phieu, hangHoa } = updateDto;
+        const ma_ct = 'HDA';
+        const ma_dvcs = 'CTY';
 
-            // Cập nhật PH81
-            await this.ph81Repository.update({ stt_rec }, {
-                ma_ct: "HDA",
-                ma_gd: updateDto.ma_gd,
-                ma_kh: updateDto.ma_kh,
-                dia_chi: updateDto.dia_chi,
-                ma_so_thue: updateDto.ma_so_thue,
-                ong_ba: updateDto.ong_ba,
-                dien_giai: updateDto.dien_giai,
-                ma_nx: updateDto.ma_nx,
-                ma_bp: updateDto.ma_bp,
-                ngay_ct: updateDto.ngay_ct,
-                ngay_lct: updateDto.ngay_lct,
-                ma_qs: updateDto.ma_qs,
-                so_seri: updateDto.so_seri,
-                so_ct: updateDto.so_ct,
-                ma_nt: updateDto.ma_nt,
-                ty_gia: updateDto.ty_gia,
-                sl_in: updateDto.sl_in,
-                ma_thue: updateDto.ma_thue,
-                thue_suat: updateDto.thue_suat,
-                tk_thue_no: updateDto.tk_no,
-                tk_thue_co: updateDto.tk_co,
-                ten_vtthue: updateDto.ten_vtthue,
-                gc_thue: updateDto.gc_thue,
-                ht_tt: updateDto.ht_tt,
-                sua_tien: updateDto.sua_tien,
-                px_gia_dd: updateDto.px_gia_dd
+        // 1. Transaction
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            // Xóa dữ liệu cũ (CT81 + CT00)
+            await queryRunner.manager.delete(Ct00, { stt_rec });
+            await queryRunner.manager.delete(Ct81, { stt_rec });
+
+            // 2. Tính tổng tiền và số lượng
+            let totalT_Tien = 0;
+            let totalSoLuong = 0;
+            hangHoa?.forEach(item => {
+                totalT_Tien += item.tien ?? 0;
+                totalSoLuong += item.so_luong ?? 0;
             });
-            ph81Saved = await this.ph81Repository.findOneBy({ stt_rec });
-        } catch (error) {
-            throw new Error('Update PH81 failed: ' + error.message);
-        }
+            const totalT_Thue = totalT_Tien * Number(phieu.thue_suat ?? 0);
 
-        try {
-            // CT81
-            if (Array.isArray(updateDto.hachToanList)) {
-                for (let i = 0; i < updateDto.hachToanList.length; i++) {
-                    const item = updateDto.hachToanList[i];
-                    const ct81 = this.HoaDonXuatKhoRepository.create({
-                        ma_ct: "HDA",
-                        stt_rec,
-                        stt_rec0: (i + 1).toString().padStart(3, '0'),
-                        ma_vt: item.ma_vt,
-                        ma_kho_i: item.ma_kho_i,
-                        so_luong: item.so_luong,
-                        gia2: item.gia2,
-                        tien2: item.tien2,
-                        gia: item.gia_nt,
-                        tien: item.tien,
-                        tk_dt: item.tk_dt,
-                        tk_vt: item.tk_vt,
-                        tk_gv: item.tk_gv,
-                        gia_nt: item.gia_nt,
-                        gia_nt2: item.gia2
-                    });
-                    await this.HoaDonXuatKhoRepository.insert(ct81);
-                    ct81Saved.push(ct81);
-                }
+            // 3. Cập nhật PH81 (header)
+            await queryRunner.manager.update(Ph81, { stt_rec }, {
+                ...phieu,
+                ma_ct,
+                ma_dvcs,
+                t_so_luong: totalSoLuong,
+                t_tien: totalT_Tien,
+                t_thue: totalT_Thue,
+                t_tt: totalT_Tien + totalT_Thue,
+                t_tien_nt2: totalT_Tien,
+                t_tien2: totalT_Tien,
+                t_tt_nt: totalT_Tien + totalT_Thue,
+                tk_thue_no: phieu.ma_nx
+            });
+
+            const ph81Saved = await queryRunner.manager.findOne(Ph81, { where: { stt_rec } });
+
+            // 4. Thêm lại CT81 (chi tiết)
+            const chiTietEntities = hangHoa?.map((item, index) =>
+                this.HoaDonXuatKhoRepository.create({
+                    ...item,
+                    stt_rec,
+                    ma_ct,
+                    so_ct: phieu.so_ct,
+                    ngay_ct: phieu.ngay_ct,
+                    stt_rec0: (index + 1).toString().padStart(3, '0')
+                })
+            ) || [];
+
+            if (chiTietEntities.length > 0) {
+                await queryRunner.manager.save(chiTietEntities);
             }
-        } catch (error) {
-            throw new Error('Update CT81 failed: ' + error.message);
-        }
 
-        // Nếu cần cập nhật ct00 thì bổ sung logic tương tự
-        await this.dataSource.query(
-            `EXEC [dbo].[SOCTHDA-Post] @stt_rec = '${stt_rec}' ,@IsHasPT1 = 0`
-        );
-        return {
-            ct81: ct81Saved,
-            ph81: ph81Saved,
-            ct00: ct00Saved,
-        };
+            // 5. Commit transaction
+            await queryRunner.commitTransaction();
+
+            // 6. Gọi các stored procedure
+            await this.dataSource.query(
+                `EXEC [dbo].[SOCTHDA-CheckData] @status = @0, @mode = @1, @stt_rec = @2`,
+                ['2', 0, stt_rec]
+            );
+
+            const ct00Saved = await this.dataSource.query(
+                `EXEC [dbo].[SOCTHDA-Post] @stt_rec = @0 , @Ap_gia = @1, @IsHasPT1 = @2`,
+                [stt_rec, 0, 0]
+            );
+
+            return {
+                ct81: chiTietEntities,
+                ph81: ph81Saved,
+                ct00: ct00Saved
+            };
+
+        } catch (err) {
+            if (queryRunner.isTransactionActive) {
+                await queryRunner.rollbackTransaction();
+            }
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
     }
+
 
     async remove(stt_rec: string): Promise<void> {
         try {
             await this.ct00Repository.delete({ stt_rec });
             await this.HoaDonXuatKhoRepository.delete({ stt_rec });
             await this.ph81Repository.delete({ stt_rec });
+            await this.ct70Repository.delete({ stt_rec });
         } catch (error) {
             throw new Error('Remove HoaDonXuatKho failed: ' + error.message);
         }

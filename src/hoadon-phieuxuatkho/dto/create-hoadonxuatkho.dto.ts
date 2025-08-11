@@ -99,10 +99,7 @@ export class CreateHoaDonXuatKhoDto {
   // status: string;
 
   // Array lưu vào ct31
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HachToanDto)
-  hachToanList: HachToanDto[];
+
 
   @Type(() => Number)
   @IsNumber()
@@ -116,10 +113,7 @@ export class CreateHoaDonXuatKhoDto {
   thue_suat: number;
 
   @IsString()
-  tk_no: string;
-
-  @IsString()
-  tk_co: string;
+  tk_thue_co: string;
 
   @IsString()
   ten_vtthue: string;
@@ -135,5 +129,18 @@ export class CreateHoaDonXuatKhoDto {
 
   @IsOptional()
   px_gia_dd?: number;
+
+}
+
+
+export class fullDto {
+  @ValidateNested({ each: true })
+  @Type(() => CreateHoaDonXuatKhoDto)
+  phieu: CreateHoaDonXuatKhoDto;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HachToanDto)
+  hangHoa: HachToanDto[];
 
 }

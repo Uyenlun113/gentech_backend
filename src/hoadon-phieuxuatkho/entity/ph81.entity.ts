@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ph81')
 export class Ph81 {
@@ -9,7 +9,7 @@ export class Ph81 {
   ma_gd: string;
 
   @Column()
-  ma_ct: string;  
+  ma_ct: string;
 
   @Column()
   ma_kh: string;
@@ -87,10 +87,23 @@ export class Ph81 {
   t_tien: number;
 
   @Column()
+  t_tien_nt2: number;
+
+  @Column()
+  t_tien2: number;
+
+  @Column()
   t_thue: number;
 
   @Column()
   t_tt: number;
+
+  @Column()
+  t_tt_nt: number;
+
+  @Column()
+  ma_dvcs: string;
+
 
   @Column({ nullable: true })
   sua_tien: number;

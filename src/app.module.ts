@@ -27,6 +27,7 @@ import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { IngiaModule } from './tinh-gia-tbt/tinh-gia-tbt.module';
+import { BaocaoTonKhoModule } from './bc-hang-ton-kho/bc-tonkho.module';
 
 
 @Module({
@@ -74,7 +75,8 @@ import { IngiaModule } from './tinh-gia-tbt/tinh-gia-tbt.module';
     HdBanDvModule,
     HoaDonXuatKhoModule,
     BaocaovonbangtienModule,
-    IngiaModule
+    IngiaModule,
+    BaocaoTonKhoModule,
   ],
 })
 export class AppModule { }

@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountDirectoryModule } from './account-directory/account-directory.module';
 import { AuthModule } from './auth/auth.module';
+import { BcBanHangPhaiThuModule } from './bc-ban-hang-phai-thu/bc-ban-hang-phai-thu.module';
+import { BaocaoTonKhoModule } from './bc-hang-ton-kho/bc-tonkho.module';
 import { BaocaovonbangtienModule } from './bc-tienmat-tiengui-bank/bc-tienmat-tiengui-bank.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { CdtkModule } from './cdtk/cdtk.module';
@@ -27,7 +29,6 @@ import { Ph85Module } from './phieu-xuat-dieu-chuyen/ph85.module';
 import { PhieuXuatKhoModule } from './phieu-xuat-kho/phieu-xuat-kho.module';
 import { CashReceiptModule } from './SupportingDocuments/CashReceipt/CashReceipt.module';
 import { IngiaModule } from './tinh-gia-tbt/tinh-gia-tbt.module';
-import { BaocaoTonKhoModule } from './bc-hang-ton-kho/bc-tonkho.module';
 
 
 @Module({
@@ -77,6 +78,7 @@ import { BaocaoTonKhoModule } from './bc-hang-ton-kho/bc-tonkho.module';
     BaocaovonbangtienModule,
     IngiaModule,
     BaocaoTonKhoModule,
+    BcBanHangPhaiThuModule
   ],
 })
 export class AppModule { }

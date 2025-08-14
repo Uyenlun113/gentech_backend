@@ -35,8 +35,8 @@ export class BcBanHangPhaiThuService {
                         ma_vt,
                         ma_dvcs,
                         ma_gd,
-                        pListVoucher,
-                        kindFilter
+                        'HDA;HDX',
+                        0
                     );
                 case 'export-plan':
                     return await this.bcDonBanHangBanDV(
@@ -57,6 +57,48 @@ export class BcBanHangPhaiThuService {
                         ma_kho,
                         ma_dvcs,
                         'PNF');
+                case 'inventory':
+                    return await this.bcDonMotMatHang(
+                        StartDate,
+                        EndDate,
+                        ma_vt,
+                        ma_kho,
+                        ma_dvcs,
+                    );
+                case 'inventory-detail':
+                    return await this.bcSobk3(
+                        StartDate,
+                        EndDate,
+                        ma_vt,
+                        ma_dvcs,
+                        ma_kho,
+                        ["HDA", "HDX"],
+                        2,
+                        'ma_kh',
+                    )
+                case 'import-export-summary':
+                    return await this.bcSobk3(
+                        StartDate,
+                        EndDate,
+                        ma_vt,
+                        ma_dvcs,
+                        ma_kho,
+                        ["HDA", "HDX"],
+                        2,
+                        'ma_nx',
+                    )
+                case 'import-export-detail':
+                    return await this.bcSobk4(
+                        StartDate,
+                        EndDate,
+                        ma_vt,
+                        ma_dvcs,
+                        ma_kho,
+                        ["HDA", "HDX"],
+                        ma_kh,
+                        2,
+                    )
+
                 default:
                     throw new BadRequestException(`Phương thức ${methodName} không hợp lệ`);
             }
@@ -103,6 +145,7 @@ export class BcBanHangPhaiThuService {
             request.input('KindFilter', sql.Int, kindFilter || 0);
 
             const result = await request.execute('SOBK1');
+            console.log(result);
 
             return {
                 data1: result.recordsets[0] || [],
@@ -183,6 +226,138 @@ export class BcBanHangPhaiThuService {
             const result = await request.execute('SOBK1F');
             return {
                 data1: result.recordsets[0] || [],
+                data2: result.recordsets[1] || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async bcDonMotMatHang(
+        StartDate: string,
+        EndDate: string,
+        ma_vt?: string,
+        ma_kho?: string,
+        ma_dvcs?: string,
+    ) {
+        try {
+            const ngay1 = formatDateToYYYYMMDD(new Date(StartDate));
+            const ngay2 = formatDateToYYYYMMDD(new Date(EndDate));
+
+            let condition = '1=1';
+            if (ma_dvcs) condition += ` AND ma_dvcs LIKE '${ma_dvcs}%'`;
+            if (ma_kho) condition += ` AND ma_kho LIKE '${ma_kho}%'`;
+
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+            request.input('MaVt', sql.NVarChar(5), ma_vt || '');
+            request.input('StartDate', sql.VarChar(8), ngay1);
+            request.input('EndDate', sql.VarChar(8), ngay2);
+            request.input('Condition', sql.NVarChar(sql.MAX), condition);
+
+            const result = await request.execute('SOBK2');
+            return {
+                data2: result.recordsets[0] || [],
+                data1: result.recordsets[1] || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async bcSobk3(
+        StartDate: string,
+        EndDate: string,
+        ma_vt?: string,
+        ma_dvcs?: string,
+        ma_kho?: string,
+        ma_ct_list?: string[],
+        nxt?: number,
+        groupBy: string = 'ma_kh',
+    ) {
+        try {
+            let sKey = '';
+            if (ma_ct_list?.length) {
+                const ctList = ma_ct_list.map(ct => `'${ct}'`).join(', ');
+                sKey += ` AND ma_ct IN (${ctList})`;
+            }
+            if (nxt !== undefined) {
+                sKey += ` AND nxt = ${nxt}`;
+            }
+            if (ma_vt) {
+                sKey += ` AND ma_vt LIKE '${ma_vt}%'`;
+            }
+            sKey += ` AND LEN(ISNULL(ma_kh,'')) <> 0`;
+            if (ma_dvcs) {
+                sKey += ` AND ma_dvcs LIKE '${ma_dvcs}%'`;
+            }
+            if (ma_kho) {
+                sKey += ` AND ma_kho LIKE '${ma_kho}%'`;
+            }
+
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+
+            request.input('ngay_ct1', sql.DateTime, new Date(StartDate));
+            request.input('ngay_ct2', sql.DateTime, new Date(EndDate));
+            request.input('sKey', sql.NVarChar(sql.MAX), sKey);
+            request.input('pGroup', sql.VarChar(50), groupBy);
+            const result = await request.execute('SOBK3');
+            return {
+                // data2: result.recordset || [],
+                data2: result.recordsets[1] || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async bcSobk4(
+        StartDate: string,
+        EndDate: string,
+        ma_vt?: string,
+        ma_dvcs?: string,
+        ma_kho?: string,
+        ma_ct_list?: string[],
+        ma_kh?: string,
+        nxt?: number,
+    ) {
+        try {
+            let sKey = '';
+
+            if (ma_ct_list?.length) {
+                const ctList = ma_ct_list.map(ct => `'${ct}'`).join(', ');
+                sKey += ` AND ma_ct IN (${ctList})`;
+            }
+            if (nxt !== undefined) {
+                sKey += ` AND nxt = ${nxt}`;
+            }
+            if (ma_kh) {
+                sKey += ` AND ma_kh = '${ma_kh}'`;
+            }
+            sKey += ` AND LEN(ISNULL(ma_kh,'')) <> 0`;
+
+            if (ma_dvcs) {
+                sKey += ` AND ma_dvcs LIKE '${ma_dvcs}%'`;
+            }
+            if (ma_kho) {
+                sKey += ` AND ma_kho LIKE '${ma_kho}%'`;
+            }
+            if (ma_vt) {
+                sKey += ` AND ma_vt LIKE '${ma_vt}%'`;
+            }
+
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+
+            request.input('ngay_ct1', sql.DateTime, new Date(StartDate));
+            request.input('ngay_ct2', sql.DateTime, new Date(EndDate));
+            request.input('sKey', sql.NVarChar(sql.MAX), sKey);
+
+            const result = await request.execute('SOBK4');
+            console.log('result', result);
+
+            return {
                 data2: result.recordsets[1] || [],
             };
         } catch (error) {

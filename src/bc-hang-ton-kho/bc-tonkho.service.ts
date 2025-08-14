@@ -352,8 +352,8 @@ export class BcTonKhoService {
             const result = await request.execute('INBK3N');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
                 condition,
             };
         } catch (error) {
@@ -400,8 +400,8 @@ export class BcTonKhoService {
             const result = await request.execute('INBK4N');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
                 condition
             };
         } catch (error) {
@@ -442,8 +442,8 @@ export class BcTonKhoService {
             const result = await request.execute('INTH1N');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
             };
         } catch (error) {
             throw new BadRequestException(`Lỗi: ${error.message}`);
@@ -609,8 +609,8 @@ export class BcTonKhoService {
             const result = await request.execute('INBK3X');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
                 condition // để debug
             };
         } catch (error) {
@@ -672,8 +672,8 @@ export class BcTonKhoService {
             const result = await request.execute('INBK3X');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
                 condition // để debug
             };
         } catch (error) {
@@ -723,8 +723,8 @@ export class BcTonKhoService {
             const result = await request.execute('INTH1X');
 
             return {
-                data: result.recordsets[0] || [],
-                totals: result.recordsets[1] || [],
+                data: result.recordsets[1] || [],
+                totals: result.recordsets[0] || [],
                 // condition // để debug
             };
         } catch (error) {

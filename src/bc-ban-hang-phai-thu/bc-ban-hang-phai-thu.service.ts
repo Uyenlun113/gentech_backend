@@ -57,7 +57,7 @@ export class BcBanHangPhaiThuService {
                         ma_kho,
                         ma_dvcs,
                         'PNF');
-                case 'inventory':
+                case 'inventory2':
                     return await this.bcDonMotMatHang(
                         StartDate,
                         EndDate,
@@ -65,7 +65,7 @@ export class BcBanHangPhaiThuService {
                         ma_kho,
                         ma_dvcs,
                     );
-                case 'inventory-detail':
+                case 'inventory-detail2':
                     return await this.bcSobk3(
                         StartDate,
                         EndDate,
@@ -76,7 +76,7 @@ export class BcBanHangPhaiThuService {
                         2,
                         'ma_kh',
                     )
-                case 'import-export-summary':
+                case 'import-export-summary2':
                     return await this.bcSobk3(
                         StartDate,
                         EndDate,

@@ -29,6 +29,13 @@ export class CallStoreDto {
 
     @IsOptional()
     @IsString()
+    ma_tk?: string;
+
+    @IsOptional()
+    ghi_no_co?: number;
+
+    @IsOptional()
+    @IsString()
     ma_dvcs?: string;
 
     @IsOptional()
@@ -47,4 +54,20 @@ export class CallStoreDto {
     @IsInt()
     @Min(0)
     kindFilter: number = 0;
+
+    @IsOptional()
+    @IsString()
+    tk_doanh_thu?: string;
+
+    @IsOptional()
+    @IsString()
+    tk_giam_tru?: string;
+
+    @IsOptional()
+    @IsString()
+    quyen_so?: string;
+
+    @IsOptional()
+    @IsString()
+    ngay_mo_so?: string;
 }

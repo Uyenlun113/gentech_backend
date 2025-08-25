@@ -18,6 +18,8 @@ export class BcBanHangPhaiThuService {
                 ma_vt,
                 ma_dvcs,
                 ma_gd,
+                ma_tk,
+                ghi_no_co,
                 pListVoucher,
                 kindFilter,
                 methodName
@@ -98,6 +100,39 @@ export class BcBanHangPhaiThuService {
                         ma_kh,
                         2,
                     )
+                case 'inventory-report':
+                    return await this.bcArctbh1(
+                        StartDate,
+                        EndDate,
+                        dto.tk_doanh_thu,
+                        dto.tk_giam_tru,
+                        ma_vt,
+                        ma_dvcs,
+                        ma_kho,
+                    );
+                case 'cost-analysis':
+                    return await this.bcGlbk1(
+                        StartDate,
+                        EndDate,
+                        ma_dvcs,
+                        ma_tk
+                    );
+                case 'performance-report':
+                    return await this.bcGlbk2(
+                        StartDate,
+                        EndDate,
+                        ma_dvcs,
+                        ma_tk,
+                        ghi_no_co
+                    );
+                case 'turnover-analysis':
+                    return await this.bcGlth2(
+                        StartDate,
+                        EndDate,
+                        ma_dvcs,
+                        ma_tk,
+                        ghi_no_co
+                    );
 
                 default:
                     throw new BadRequestException(`Phương thức ${methodName} không hợp lệ`);
@@ -145,7 +180,6 @@ export class BcBanHangPhaiThuService {
             request.input('KindFilter', sql.Int, kindFilter || 0);
 
             const result = await request.execute('SOBK1');
-            console.log(result);
 
             return {
                 data1: result.recordsets[0] || [],
@@ -355,7 +389,6 @@ export class BcBanHangPhaiThuService {
             request.input('sKey', sql.NVarChar(sql.MAX), sKey);
 
             const result = await request.execute('SOBK4');
-            console.log('result', result);
 
             return {
                 data2: result.recordsets[1] || [],
@@ -364,4 +397,167 @@ export class BcBanHangPhaiThuService {
             throw new BadRequestException(`Lỗi: ${error.message}`);
         }
     }
+
+    async bcArctbh1(
+        StartDate: string,
+        EndDate: string,
+        tk_doanh_thu?: string,
+        tk_giam_tru?: string,
+        ma_vt?: string,
+        ma_dvcs?: string,
+        ma_kho?: string,
+    ) {
+        try {
+            const tuNg = formatDateToYYYYMMDD(new Date(StartDate));
+            const denNg = formatDateToYYYYMMDD(new Date(EndDate));
+
+            // Build filter condition
+            let filter = ' 1=1';
+            if (ma_vt) filter += ` and ma_vt like '${ma_vt}%'`;
+            if (ma_dvcs) filter += ` and ma_dvcs Like '${ma_dvcs}%'`;
+            if (ma_kho) filter += ` and ma_kho like '${ma_kho}%'`;
+
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+
+            // Đặt các input cho proc
+            request.input('TuNg', sql.VarChar(8), tuNg);
+            request.input('DenNg', sql.VarChar(8), denNg);
+            request.input('tk_dt', sql.VarChar(10), tk_doanh_thu || '511');
+            request.input('tk_gt', sql.VarChar(50), tk_giam_tru || '521,531,532');
+            request.input('filter', sql.VarChar(sql.MAX), filter);
+
+            const result = await request.execute('ARCTBH1');
+
+            return {
+                data1: result.recordsets || [],
+                data2: result.recordset || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+    async bcGlbk1(
+        StartDate: string,
+        EndDate: string,
+        ma_dvcs?: string,
+        tk?: string,
+    ) {
+        try {
+            const tuNg = formatDateToYYYYMMDD(new Date(StartDate));
+            const denNg = formatDateToYYYYMMDD(new Date(EndDate));
+            let filter = '';
+            if (tk) filter += ` AND tk LIKE '${tk}%'`;
+            if (ma_dvcs) filter += ` AND ma_dvcs LIKE '${ma_dvcs}%'`;
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+            request.input('StartDate', sql.VarChar(8), tuNg);
+            request.input('EndDate', sql.VarChar(8), denNg);
+            request.input('Condition', sql.NVarChar(sql.MAX), filter);
+
+            const result = await request.execute('GLBK1');
+
+            return {
+                data2: result.recordset || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+    async bcGlbk2(
+        StartDate: string,
+        EndDate: string,
+        ma_dvcs?: string,
+        tk?: string,
+        ghi_no_co?: number,
+    ) {
+        try {
+            const tuNg = formatDateToYYYYMMDD(new Date(StartDate));
+            const denNg = formatDateToYYYYMMDD(new Date(EndDate));
+            let filter = '1=1';
+            if (ma_dvcs) filter += ` and ma_dvcs LIKE '${ma_dvcs}%'`;
+            if (tk) filter += ` and tk LIKE '${tk}%'`;
+
+            const ghiNoCo = Number(ghi_no_co);
+            if (ghiNoCo === 1) {
+                filter += ' and ps_no<>0';
+            } else if (ghiNoCo === 2) {
+                filter += ' and ps_co<>0';
+            }
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+
+            request.input('store', sql.VarChar(5), 'glbk2');
+            request.input('ngay_ct1', sql.Char(8), tuNg);
+            request.input('ngay_ct2', sql.Char(8), denNg);
+            request.input('tk', sql.VarChar(8), tk || '');
+            request.input('condition', sql.NVarChar(200), filter);
+            request.input('loai_bc', sql.Char(1), '3');
+
+            const query = `
+            EXEC sp_executesql 
+                N'EXEC @store @ngay_ct1, @ngay_ct2, @tk, @condition, @loai_bc',
+                N'@store varchar(5), @ngay_ct1 char(8), @ngay_ct2 char(8), @tk varchar(3), @condition nvarchar(200), @loai_bc char(1)',
+                @store, @ngay_ct1, @ngay_ct2, @tk, @condition, @loai_bc
+        `;
+
+            const result = await request.query(query);
+
+            return {
+                data2: result.recordset || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async bcGlth2(
+        StartDate: string,
+        EndDate: string,
+        ma_dvcs?: string,
+        tk?: string,
+        ghi_no_co?: number,
+    ) {
+        try {
+            const tuNg = formatDateToYYYYMMDD(new Date(StartDate));
+            const denNg = formatDateToYYYYMMDD(new Date(EndDate));
+            let filter = '1=1';
+            if (ma_dvcs) filter += ` and ma_dvcs LIKE '${ma_dvcs}%'`;
+            if (tk) filter += ` and tk LIKE '${tk}%'`;
+
+            const ghiNoCo = Number(ghi_no_co);
+            if (ghiNoCo === 1) {
+                filter += ' and ps_no<>0';
+            } else if (ghiNoCo === 2) {
+                filter += ' and ps_co<>0';
+            }
+
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+
+            request.input('store', sql.VarChar(5), 'glth2');
+            request.input('loai_bc', sql.Char(1), '3');
+            request.input('ngay_ct1', sql.Char(8), tuNg);
+            request.input('ngay_ct2', sql.Char(8), denNg);
+            request.input('tk', sql.VarChar(4), tk || '');   // varchar(4) đúng với proc mẫu
+            request.input('condition', sql.NVarChar(200), filter);
+
+            const query = `
+            EXEC sp_executesql 
+                N'EXEC @store @loai_bc, @ngay_ct1, @ngay_ct2, @tk, @condition',
+                N'@store varchar(5), @loai_bc char(1), @ngay_ct1 char(8), @ngay_ct2 char(8), @tk varchar(4), @condition nvarchar(200)',
+                @store, @loai_bc, @ngay_ct1, @ngay_ct2, @tk, @condition
+        `;
+
+            const result = await request.query(query);
+
+            return {
+                data2: result.recordset || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+
 }

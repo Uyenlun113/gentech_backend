@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class CallStoreDto {
     @IsOptional()
@@ -30,6 +30,22 @@ export class CallStoreDto {
     @IsOptional()
     @IsString()
     ma_tk?: string;
+
+    @IsOptional()
+    @IsString()
+    ma_khach: string;
+
+    @IsOptional()
+    @IsString()
+    tai_khoan: string;
+
+    @IsOptional()
+    @IsDateString()
+    ngay: string;
+
+    @IsOptional()
+    @IsString()
+    tien_mat_vnd: string;
 
     @IsOptional()
     ghi_no_co?: number;
@@ -70,4 +86,7 @@ export class CallStoreDto {
     @IsOptional()
     @IsString()
     ngay_mo_so?: string;
+
+    @IsOptional()
+    chi_tiet?: number;
 }

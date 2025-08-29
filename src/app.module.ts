@@ -5,6 +5,7 @@ import { AccountDirectoryModule } from './account-directory/account-directory.mo
 import { AuthModule } from './auth/auth.module';
 import { BcBanHangPhaiThuModule } from './bc-ban-hang-phai-thu/bc-ban-hang-phai-thu.module';
 import { BaocaoTonKhoModule } from './bc-hang-ton-kho/bc-tonkho.module';
+import { BaocaoMuaHangModule } from './bc-mua-hang/bc-muahang.module';
 import { BaocaovonbangtienModule } from './bc-tienmat-tiengui-bank/bc-tienmat-tiengui-bank.module';
 import { CategoryCustomerModule } from './category-customer/category-customer.module';
 import { CdtkModule } from './cdtk/cdtk.module';
@@ -78,6 +79,7 @@ import { IngiaModule } from './tinh-gia-tbt/tinh-gia-tbt.module';
     BaocaovonbangtienModule,
     IngiaModule,
     BaocaoTonKhoModule,
+    BaocaoMuaHangModule,
     BcBanHangPhaiThuModule
   ],
 })

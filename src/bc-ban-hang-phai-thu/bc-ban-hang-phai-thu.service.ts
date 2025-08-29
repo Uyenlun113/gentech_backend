@@ -20,9 +20,11 @@ export class BcBanHangPhaiThuService {
                 ma_gd,
                 ma_tk,
                 ghi_no_co,
-                pListVoucher,
-                kindFilter,
-                methodName
+                methodName,
+                ma_khach,
+                tai_khoan,
+                ngay,
+                chi_tiet,
             } = dto;
 
             switch (methodName) {
@@ -133,6 +135,24 @@ export class BcBanHangPhaiThuService {
                         ma_tk,
                         ghi_no_co
                     );
+                case 'abc-analysis':
+                    return await this.arsd2(
+                        ma_khach,
+                        tai_khoan,
+                        ma_dvcs,
+                        ngay
+                    );
+                case 'inventory-valuation':
+                    return await this.arso1b(
+                        ma_tk,
+                        ma_kh,
+                        StartDate,
+                        EndDate,
+                        chi_tiet || 0,
+                        ma_dvcs,
+
+                    );
+
 
                 default:
                     throw new BadRequestException(`Phương thức ${methodName} không hợp lệ`);
@@ -553,6 +573,79 @@ export class BcBanHangPhaiThuService {
 
             return {
                 data2: result.recordset || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async arsd2(
+        ma_kh: string,
+        tk: string,
+        ma_dvcs?: string,
+        ngay_ct?: string,
+    ) {
+        try {
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+            request.input('ma_kh', sql.VarChar(20), ma_kh);
+            request.input('tk', sql.VarChar(20), tk);
+            request.input('ma_dvcs', sql.VarChar(20), ma_dvcs);
+            request.input('ngay_ct', sql.Char(10), ngay_ct);
+            const query = `
+                EXEC ARSD2 
+                    @ma_kh = @ma_kh, 
+                    @tk = @tk, 
+                    @ma_dvcs = @ma_dvcs, 
+                    @ngay_ct = @ngay_ct
+                `;
+            const result = await request.query(query);
+            return {
+                data1: result.recordset || [],
+                data2: result.recordsets[1] || [],
+            };
+        } catch (error) {
+            throw new BadRequestException(`Lỗi: ${error.message}`);
+        }
+    }
+
+    async arso1b(
+        ma_tk?: string,
+        ma_kh?: string,
+        StartDate?: string,
+        EndDate?: string,
+        chitiet?: number,
+        ma_dvcs?: string,
+    ) {
+        try {
+            const ctTuNg = formatDateToYYYYMMDD(StartDate ? new Date(StartDate) : new Date());
+            const ctDenNg = formatDateToYYYYMMDD(EndDate ? new Date(EndDate) : new Date());
+            const pool = await sql.connect(sqlConfig);
+            const request = pool.request();
+            request.input('ma_tk', sql.Char(4), ma_tk);
+            request.input('ma_kh', sql.Char(5), ma_kh);
+            request.input('ctTuNg', sql.VarChar(8), ctTuNg);
+            request.input('ctDenNg', sql.VarChar(8), ctDenNg);
+            request.input('chitiet', sql.Char(1), chitiet);
+            request.input('ma_dvcs', sql.Char(3), ma_dvcs);
+            request.input('filter', sql.VarChar(200), '1=1');
+
+            const query = `
+                EXEC sp_executesql 
+                    N'EXEC ARSO1B @ma_tk, @ma_kh, @ctTuNg, @ctDenNg, @chitiet, @ma_dvcs, @filter',
+                    N'@ma_tk CHAR(4), 
+                    @ma_kh CHAR(5), 
+                    @ctTuNg VARCHAR(8), 
+                    @ctDenNg VARCHAR(8), 
+                    @chitiet CHAR(1), 
+                    @ma_dvcs CHAR(3), 
+                    @filter VARCHAR(200)',
+                    @ma_tk, @ma_kh, @ctTuNg, @ctDenNg, @chitiet, @ma_dvcs, @filter
+                `;
+            const result = await request.query(query);
+            return {
+                data1: result.recordsets[1] || [],
+                data2: result.recordset || []
             };
         } catch (error) {
             throw new BadRequestException(`Lỗi: ${error.message}`);

@@ -23,6 +23,32 @@ export class BcMuaHangService {
                 ma_kho_nhap,
                 ma_kho_xuat,
                 loai_phieu_nhap,
+                // Additional parameters for other methods
+                ma_kh,
+                ma_vt,
+                ma_gd,
+                tk,
+                tk_cn,
+                tk_du,
+                loai_bc,
+                ma_hdm,
+                hd_tu_ng,
+                hd_den_ng,
+                ct_tu_ng,
+                ct_den_ng,
+                chi_phi,
+                tu_ngay,
+                den_ngay,
+                so_ct_tu,
+                so_ct_den,
+                detail,
+                kieu_bc,
+                sqlTable,
+                sqlFields,
+                orderCol,
+                filter,
+                top,
+                count,
             } = dto;
             let rpData = {}
             switch (configName) {
@@ -30,8 +56,8 @@ export class BcMuaHangService {
                     rpData = await this.bangKePhieuNhap({
                         ngay_ct1,
                         ngay_ct2,
-                        ma_khach,
-                        ma_vat_tu,
+                        ma_khach: ma_khach || ma_kh,
+                        ma_vat_tu: ma_vat_tu || ma_vt,
                         chung_tu_tu_so,
                         den_so,
                         ma_kho,
@@ -43,9 +69,217 @@ export class BcMuaHangService {
                     rpData = await this.bangKeHoaDonMuaHangDV({
                         ngay_ct1,
                         ngay_ct2,
-                        ma_khach,
+                        ma_khach: ma_khach || ma_kh,
                         chung_tu_tu_so,
                         den_so,
+                    });
+                    break;
+
+                case "bang_ke_phieu_xuat_tra_lai_ncc":
+                    rpData = await this.bangKePhieuXuatTraLaiNCC({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_khach: ma_khach || ma_kh,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                    });
+                    break;
+
+                case "bang_ke_phieu_nhap_mot_mat_hang":
+                    rpData = await this.bangKePhieuNhapMotMatHang({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_vt: ma_vat_tu || ma_vt,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                    });
+                    break;
+
+                case "bang_ke_phieu_nhap_mot_mat_hang_nhom_theo_ncc":
+                    rpData = await this.bangKePhieuNhapMotMatHangNhomTheoNCC({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_vt: ma_vat_tu || ma_vt,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                        ma_gd,
+                    });
+                    break;
+
+                case "bang_ke_mot_mat_hang_nhom_theo_dang_nhap_mua":
+                    rpData = await this.bangKeMotMatHangNhomTheoDangNhapMua({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_vt: ma_vat_tu || ma_vt,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                        ma_gd,
+                    });
+                    break;
+
+                case "bang_ke_ncc_nhom_theo_mat_hang":
+                    rpData = await this.bangKeNCCNhomTheoMatHang({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_kh: ma_khach || ma_kh,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                    });
+                    break;
+
+                case "bao_cao_tong_hop_hang_nhap_mua":
+                    rpData = await this.baoCaoTongHopHangNhapMua({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_kh: ma_khach || ma_kh,
+                        ma_vt: ma_vat_tu || ma_vt,
+                        chung_tu_tu_so,
+                        den_so,
+                        ma_kho,
+                    });
+                    break;
+
+                case "bang_ke_chung_tu":
+                    rpData = await this.bangKeChungTu({
+                        ngay_ct1,
+                        ngay_ct2,
+                        chung_tu_tu_so,
+                        den_so,
+                        tk,
+                    });
+                    break;
+
+                case "bang_ke_chung_tu_ncc":
+                    rpData = await this.bangKeChungTuNCC({
+                        ngay_ct1,
+                        ngay_ct2,
+                        tk,
+                        chung_tu_tu_so,
+                        den_so,
+                        loai_bc,
+                    });
+                    break;
+
+                case "tong_hop_phat_sinh_ncc":
+                    rpData = await this.tongHopPhatSinhNCC({
+                        ngay_ct1,
+                        ngay_ct2,
+                        tk,
+                        chung_tu_tu_so,
+                        den_so,
+                        loai_bc,
+                    });
+                    break;
+
+                case "tra_so_du_cong_no_ncc":
+                    rpData = await this.traSoDuCongNoNCC({
+                        sqlTable,
+                        sqlFields,
+                        orderCol,
+                        filter,
+                        top,
+                        count,
+                    });
+                    break;
+
+                case "so_chi_tiet_cong_no_ncc":
+                    rpData = await this.soChiTietCongNoNCC({
+                        tk_cn,
+                        ma_kh: ma_khach || ma_kh,
+                        ngay_ct1,
+                        ngay_ct2,
+                        detail,
+                        ma_dvcs,
+                        condition: '',
+                    });
+                    break;
+
+                case "so_doi_chieu_cong_no":
+                    rpData = await this.soDoiChieuCongNo({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_kh: ma_khach || ma_kh,
+                        tk,
+                        ma_dvcs,
+                        kieu_bc,
+                    });
+                    break;
+
+                case "so_chi_tiet_cong_no":
+                    rpData = await this.soChiTietCongNo({
+                        tk,
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_kh: ma_khach || ma_kh,
+                        ma_dvcs,
+                    });
+                    break;
+
+                case "bang_ke_don_hang":
+                    rpData = await this.bangKeDonHang({
+                        ngay_ct1,
+                        ngay_ct2,
+                        ma_hdm,
+                        ma_gd,
+                        ma_dvcs,
+                        ma_kh: ma_khach || ma_kh,
+                        ma_kho,
+                        ma_vt: ma_vat_tu || ma_vt,
+                    });
+                    break;
+
+                case "bao_cao_thuc_hien_don_hang":
+                    rpData = await this.baoCaoThucHienDonHang({
+                        hd_tu_ng,
+                        hd_den_ng,
+                        ct_tu_ng,
+                        ct_den_ng,
+                        chi_phi,
+                        ma_kh: ma_khach || ma_kh,
+                        ma_hdm,
+                        ma_dvcs,
+                        ma_kho,
+                    });
+                    break;
+
+                case "bao_cao_tinh_hinh_ke_hoach_don_hang":
+                    rpData = await this.baoCaoTinhHinhKeHoachDonHang({
+                        hd_tu_ng,
+                        hd_den_ng,
+                        ct_tu_ng,
+                        ct_den_ng,
+                        chi_phi,
+                        ma_kh: ma_khach || ma_kh,
+                        ma_hdm,
+                        ma_dvcs,
+                        ma_kho,
+                    });
+                    break;
+
+                case "so_chi_tiet_don_hang":
+                    rpData = await this.soChiTietDonHang({
+                        tu_ngay,
+                        den_ngay,
+                        ma_hdm,
+                        tk,
+                        ma_dvcs,
+                    });
+                    break;
+
+                case "bang_ke_chung_tu_don_hang":
+                    rpData = await this.bangKeChungTuDonHang({
+                        ct_tu_ng,
+                        ct_den_ng,
+                        so_ct_tu,
+                        so_ct_den,
+                        tk,
+                        tk_du,
+                        ma_dvcs,
                     });
                     break;
 

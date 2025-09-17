@@ -16,12 +16,8 @@ export class BcMuaHangService {
                 chung_tu_tu_so,
                 den_so,
                 configName,
-                kieu_loc,
-                mau_vnd_ngoai_te,
                 ma_dvcs,
                 ma_kho,
-                ma_kho_nhap,
-                ma_kho_xuat,
                 loai_phieu_nhap,
                 // Additional parameters for other methods
                 ma_kh,
@@ -65,7 +61,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_hoa_don_mua_hang_dv":
+                case "bang_ke_hoa_don_mua_hang_va_dich_vu":
                     rpData = await this.bangKeHoaDonMuaHangDV({
                         ngay_ct1,
                         ngay_ct2,
@@ -75,7 +71,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_phieu_xuat_tra_lai_ncc":
+                case "bang_ke_phieu_xuat_tra_lai_nha_cung_cap":
                     rpData = await this.bangKePhieuXuatTraLaiNCC({
                         ngay_ct1,
                         ngay_ct2,
@@ -86,7 +82,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_phieu_nhap_mot_mat_hang":
+                case "bang_ke_phieu_nhap_cua_mot_mat_hang":
                     rpData = await this.bangKePhieuNhapMotMatHang({
                         ngay_ct1,
                         ngay_ct2,
@@ -97,7 +93,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_phieu_nhap_mot_mat_hang_nhom_theo_ncc":
+                case "bang_ke_phieu_nhap_cua_mot_mat_hang_nhom_theo_nha_cung_cap":
                     rpData = await this.bangKePhieuNhapMotMatHangNhomTheoNCC({
                         ngay_ct1,
                         ngay_ct2,
@@ -109,7 +105,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_mot_mat_hang_nhom_theo_dang_nhap_mua":
+                case "bang_ke_phieu_nhap_cua_mot_mat_hang_nhom_theo_dang_nhap_mua":
                     rpData = await this.bangKeMotMatHangNhomTheoDangNhapMua({
                         ngay_ct1,
                         ngay_ct2,
@@ -121,7 +117,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_ncc_nhom_theo_mat_hang":
+                case "bang_ke_phieu_nhap_cua_mot_nha_cung_cap_nhom_theo_mat_hang":
                     rpData = await this.bangKeNCCNhomTheoMatHang({
                         ngay_ct1,
                         ngay_ct2,
@@ -154,7 +150,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_chung_tu_ncc":
+                case "bang_ke_chung_tu_theo_nha_cung_cap":
                     rpData = await this.bangKeChungTuNCC({
                         ngay_ct1,
                         ngay_ct2,
@@ -165,7 +161,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "tong_hop_phat_sinh_ncc":
+                case "tong_hop_so_phat_sinh_theo_nha_cung_cap":
                     rpData = await this.tongHopPhatSinhNCC({
                         ngay_ct1,
                         ngay_ct2,
@@ -176,7 +172,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "tra_so_du_cong_no_ncc":
+                case "tra_so_du_cong_no_cua_mot_nha_cung_cap":
                     rpData = await this.traSoDuCongNoNCC({
                         sqlTable,
                         sqlFields,
@@ -187,7 +183,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "so_chi_tiet_cong_no_ncc":
+                case "so_chi_tiet_cong_no_cua_mot_nha_cung_cap":
                     rpData = await this.soChiTietCongNoNCC({
                         tk_cn,
                         ma_kh: ma_khach || ma_kh,
@@ -210,7 +206,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "so_chi_tiet_cong_no":
+                case "so_chi_tiet_cong_no_len_tat_ca_nha_cung_cap":
                     rpData = await this.soChiTietCongNo({
                         tk,
                         ngay_ct1,
@@ -247,7 +243,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bao_cao_tinh_hinh_ke_hoach_don_hang":
+                case "bao_cao_tinh_hinh_thuc_hien_ke_hoach_don_hang":
                     rpData = await this.baoCaoTinhHinhKeHoachDonHang({
                         hd_tu_ng,
                         hd_den_ng,
@@ -271,7 +267,7 @@ export class BcMuaHangService {
                     });
                     break;
 
-                case "bang_ke_chung_tu_don_hang":
+                case "bang_ke_chung_tu_phat_sinh_theo_don_hang":
                     rpData = await this.bangKeChungTuDonHang({
                         ct_tu_ng,
                         ct_den_ng,
@@ -1214,7 +1210,6 @@ export class BcMuaHangService {
             request.input('Condition', sql.NVarChar(sql.MAX), condition);
 
             const result = await request.execute('POBKHDM');
-
             return {
                 data: result.recordsets[0] || [],
                 totals: result.recordsets[1] || [],

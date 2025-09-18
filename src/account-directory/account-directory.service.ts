@@ -22,12 +22,14 @@ export class AccountDirectoryService {
         const { page = 1, limit = 500, search, nh_tk, tk_me } = queryDto;
         try {
             const queryBuilder = this.accountDirectoryRepository.createQueryBuilder('dmtk');
+
             if (search) {
                 queryBuilder.where(
                     '(dmtk.tk LIKE :search OR dmtk.ten_tk LIKE :search)',
                     { search: `%${search}%` }
                 );
             }
+
             if (nh_tk) {
                 if (search) {
                     queryBuilder.andWhere('dmtk.nh_tk = :nh_tk', { nh_tk });
@@ -35,17 +37,22 @@ export class AccountDirectoryService {
                     queryBuilder.where('dmtk.nh_tk = :nh_tk', { nh_tk });
                 }
             }
+
             if (tk_me) {
                 queryBuilder.andWhere('dmtk.tk_me = :tk_me', { tk_me });
             }
+
+            queryBuilder.andWhere('(dmtk.tk_me IS NOT NULL AND dmtk.tk_me != \'\')');
+
             const [data, total] = await queryBuilder
                 .skip((page - 1) * limit)
                 .take(limit)
                 .orderBy('dmtk.tk', 'ASC')
                 .getManyAndCount();
+
             return {
                 status: HttpStatus.OK,
-                message: 'Danh sách tài khoản',
+                message: 'Danh sách tài khoản (loại bỏ tk mẹ)',
                 data,
                 pagination: {
                     page,
@@ -58,6 +65,7 @@ export class AccountDirectoryService {
             throw new BadRequestException(`Lỗi khi lấy danh sách tài khoản: ${error.message}`);
         }
     }
+
 
     // Thêm mới tài khoản
     async create(dto: CreateAccountDto) {

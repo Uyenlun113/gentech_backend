@@ -19,12 +19,10 @@ export class BcMuaHangService {
                 ma_dvcs,
                 ma_kho,
                 loai_phieu_nhap,
-                // Additional parameters for other methods
                 ma_kh,
                 ma_vt,
                 ma_gd,
                 ma_tai_khoan,
-                tk_cn,
                 tk_du,
                 loai_bao_cao,
                 ma_hdm,
@@ -37,15 +35,10 @@ export class BcMuaHangService {
                 den_ngay,
                 so_ct_tu,
                 so_ct_den,
-                detail,
                 kieu_bc,
-                sqlTable,
-                sqlFields,
-                orderCol,
-                filter,
-                top,
-                count,
                 ghi_no_co,
+                ngay_dh1,
+                ngay_dh2,
             } = dto;
             let rpData = {}
             switch (configName) {
@@ -185,13 +178,10 @@ export class BcMuaHangService {
 
                 case "so_chi_tiet_cong_no_cua_mot_nha_cung_cap":
                     rpData = await this.soChiTietCongNoNCC({
-                        tk_cn,
-                        ma_kh: ma_khach || ma_kh,
+                        ma_tai_khoan,
+                        ma_kh,
                         ngay_ct1,
                         ngay_ct2,
-                        detail,
-                        ma_dvcs,
-                        condition: '',
                     });
                     break;
 
@@ -231,10 +221,10 @@ export class BcMuaHangService {
 
                 case "bao_cao_thuc_hien_don_hang":
                     rpData = await this.baoCaoThucHienDonHang({
-                        hd_tu_ng,
-                        hd_den_ng,
-                        ct_tu_ng,
-                        ct_den_ng,
+                        ngay_dh1,
+                        ngay_dh2,
+                        ngay_ct1,
+                        ngay_ct2,
                         chi_phi,
                         ma_kh: ma_khach || ma_kh,
                         ma_hdm,
@@ -245,10 +235,10 @@ export class BcMuaHangService {
 
                 case "bao_cao_tinh_hinh_thuc_hien_ke_hoach_don_hang":
                     rpData = await this.baoCaoTinhHinhKeHoachDonHang({
-                        hd_tu_ng,
-                        hd_den_ng,
-                        ct_tu_ng,
-                        ct_den_ng,
+                        ngay_dh1,
+                        ngay_dh2,
+                        ngay_ct1,
+                        ngay_ct2,
                         chi_phi,
                         ma_kh: ma_khach || ma_kh,
                         ma_hdm,
@@ -259,8 +249,8 @@ export class BcMuaHangService {
 
                 case "so_chi_tiet_don_hang":
                     rpData = await this.soChiTietDonHang({
-                        tu_ngay,
-                        den_ngay,
+                        ngay_ct1,
+                        ngay_ct2,
                         ma_hdm,
                         ma_tai_khoan,
                         ma_dvcs,
@@ -269,10 +259,10 @@ export class BcMuaHangService {
 
                 case "bang_ke_chung_tu_phat_sinh_theo_don_hang":
                     rpData = await this.bangKeChungTuDonHang({
-                        ct_tu_ng,
-                        ct_den_ng,
-                        so_ct_tu,
-                        so_ct_den,
+                        ngay_ct1,
+                        ngay_ct2,
+                        chung_tu_tu_so,
+                        den_so,
                         ma_tai_khoan,
                         tk_du,
                         ma_dvcs,
@@ -1038,15 +1028,11 @@ export class BcMuaHangService {
         }
     }
 
-
     async soChiTietCongNoNCC({
-        tk_cn,
+        ma_tai_khoan,
         ma_kh,
         ngay_ct1,
         ngay_ct2,
-        detail = 0,
-        ma_dvcs = 'CTY',
-        condition = '',
     }) {
         try {
             // Chuyển ngày về dạng YYYYMMDD
@@ -1056,26 +1042,35 @@ export class BcMuaHangService {
             const pool = await sql.connect(sqlConfig);
             const request = pool.request();
 
-            // Input cho thủ tục
-            request.input('Tk_cn', sql.Char(4), tk_cn.trim());
-            request.input('Ma_kh', sql.Char(5), ma_kh.trim());
+            // Truyền tham số đúng với Proc_ARSO1NCC
+            request.input('Tk_cn', sql.Char, ma_tai_khoan?.trim() || '');
+            request.input('Ma_kh', sql.Char, ma_kh?.trim() || '');
             request.input('StartDate', sql.VarChar(8), startDate);
             request.input('EndDate', sql.VarChar(8), endDate);
-            request.input('Detail', sql.Int, detail);
-            request.input('Ma_dvcs', sql.Char(3), ma_dvcs.trim());
-            request.input('Condition', sql.NVarChar(sql.MAX), condition);
+            request.input('Detail', sql.Int, 0);
+            request.input('Ma_dvcs', sql.Char, 'CTY');
+            request.input('Condition', sql.NVarChar(sql.MAX), '');
 
-            // Gọi Proc_ARSO1NCC
+            // Gọi thủ tục
             const result = await request.execute('Proc_ARSO1NCC');
 
             return {
                 data: result.recordset || [],
-                params: { tk_cn, ma_kh, startDate, endDate, detail, ma_dvcs, condition },
+                params: {
+                    ma_tai_khoan,
+                    ma_kh,
+                    startDate,
+                    endDate,
+                    detail: 0,
+                    ma_dvcs: 'CTY',
+                    condition: '', // để debug
+                },
             };
         } catch (error) {
             throw new BadRequestException(`Lỗi: ${error.message}`);
         }
     }
+
     async soDoiChieuCongNo({
         ngay_ct1,
         ngay_ct2,
@@ -1095,7 +1090,7 @@ export class BcMuaHangService {
                 conditionParts.push(`ma_kh LIKE '${ma_kh.trim()}'`);
             }
             if (ma_tai_khoan?.trim()) {
-                conditionParts.push(`ma_tai_khoan LIKE '${ma_tai_khoan.trim()}%'`);
+                conditionParts.push(`tk LIKE '${ma_tai_khoan.trim()}%'`);
             }
             if (ma_dvcs?.trim()) {
                 conditionParts.push(`ma_dvcs LIKE '${ma_dvcs.trim()}%'`);
@@ -1131,8 +1126,8 @@ export class BcMuaHangService {
     }) {
         try {
             // Chuyển ngày sang dạng YYYY-MM-DD 00:00:00
-            const startDate = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1)) + ' 00:00:00';
-            const endDate = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2)) + ' 00:00:00';
+            const startDate = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1));
+            const endDate = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2));
 
             // Build Advance condition
             let advanceParts: string[] = [];
@@ -1149,8 +1144,8 @@ export class BcMuaHangService {
             const request = pool.request();
 
             request.input('Tk', sql.VarChar(10), ma_tai_khoan.trim());
-            request.input('Ngay_ct1', sql.DateTime, startDate);
-            request.input('Ngay_ct2', sql.DateTime, endDate);
+            request.input('Ngay_ct1', sql.VarChar(8), startDate);
+            request.input('Ngay_ct2', sql.VarChar(8), endDate);
             request.input('Advance', sql.NVarChar(sql.MAX), advance);
 
             const result = await request.execute('Arso1t2');
@@ -1223,10 +1218,10 @@ export class BcMuaHangService {
         }
     }
     async baoCaoThucHienDonHang({
-        hd_tu_ng,
-        hd_den_ng,
-        ct_tu_ng,
-        ct_den_ng,
+        ngay_dh1,
+        ngay_dh2,
+        ngay_ct1,
+        ngay_ct2,
         chi_phi = '0',
         ma_kh,
         ma_hdm,
@@ -1235,27 +1230,27 @@ export class BcMuaHangService {
     }) {
         try {
             // Chuẩn hóa ngày
-            const hdTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(hd_tu_ng));
-            const hdDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(hd_den_ng));
-            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_tu_ng));
-            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_den_ng));
+            const hdTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_dh1));
+            const hdDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_dh2));
+            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1));
+            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2));
 
             // Điều kiện (khách hàng, hợp đồng…)
             let conditionParts: string[] = ['1=1'];
-            if (ma_kh?.trim()) {
+            if (ma_kh) {
                 conditionParts.push(`and ma_kh = '${ma_kh.trim()}'`);
             }
-            if (ma_hdm?.trim()) {
+            if (ma_hdm) {
                 conditionParts.push(`and ma_hdm = '${ma_hdm.trim()}'`);
             }
             const condition = conditionParts.join(' ');
 
             // Filter (dvcs, kho…)
             let filterParts: string[] = ['1=1'];
-            if (ma_dvcs?.trim()) {
+            if (ma_dvcs) {
                 filterParts.push(`and ma_dvcs LIKE '${ma_dvcs.trim()}%'`);
             }
-            if (ma_kho?.trim()) {
+            if (ma_kho) {
                 filterParts.push(`and ma_kho LIKE '${ma_kho.trim()}%'`);
             }
             const filter = filterParts.join(' ');
@@ -1265,7 +1260,7 @@ export class BcMuaHangService {
             const request = pool.request();
 
             request.input('hdTuNg', sql.VarChar(8), hdTuNg);
-            request.input('dhDenNg', sql.VarChar(8), hdDenNg);
+            request.input('hdDenNg', sql.VarChar(8), hdDenNg);
             request.input('ctTuNg', sql.VarChar(8), ctTuNg);
             request.input('ctDenNg', sql.VarChar(8), ctDenNg);
             request.input('chiPhi', sql.Char(1), chi_phi);
@@ -1276,6 +1271,7 @@ export class BcMuaHangService {
 
             return {
                 data: result.recordset || [],
+                totals: result.recordsets[1] || [],
                 condition,
                 filter,
             };
@@ -1284,10 +1280,10 @@ export class BcMuaHangService {
         }
     }
     async baoCaoTinhHinhKeHoachDonHang({
-        hd_tu_ng,
-        hd_den_ng,
-        ct_tu_ng,
-        ct_den_ng,
+        ngay_dh1,
+        ngay_dh2,
+        ngay_ct1,
+        ngay_ct2,
         chi_phi = '0',
         ma_kh,
         ma_hdm,
@@ -1296,10 +1292,10 @@ export class BcMuaHangService {
     }) {
         try {
             // Chuẩn hóa ngày
-            const hdTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(hd_tu_ng));
-            const hdDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(hd_den_ng));
-            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_tu_ng));
-            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_den_ng));
+            const hdTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_dh1));
+            const hdDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_dh2));
+            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1));
+            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2));
 
             // Điều kiện
             let conditionParts: string[] = ['1=1'];
@@ -1318,7 +1314,7 @@ export class BcMuaHangService {
             const request = pool.request();
 
             request.input('hdTuNg', sql.VarChar(8), hdTuNg);
-            request.input('dhDenNg', sql.VarChar(8), hdDenNg);
+            request.input('hdDenNg', sql.VarChar(8), hdDenNg);
             request.input('ctTuNg', sql.VarChar(8), ctTuNg);
             request.input('ctDenNg', sql.VarChar(8), ctDenNg);
             request.input('chiPhi', sql.Char(1), chi_phi);
@@ -1337,16 +1333,16 @@ export class BcMuaHangService {
         }
     }
     async soChiTietDonHang({
-        tu_ngay,
-        den_ngay,
+        ngay_ct1,
+        ngay_ct2,
         ma_hdm,
         ma_tai_khoan,
         ma_dvcs = 'CTY',
     }) {
         try {
             // Chuẩn hóa ngày sang YYYYMMDD
-            const tungay = formatDateToYYYYMMDD(parseDDMMYYYY(tu_ngay));
-            const denngay = formatDateToYYYYMMDD(parseDDMMYYYY(den_ngay));
+            const tungay = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1));
+            const denngay = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2));
 
             // Build condition
             let conditionParts: string[] = [];
@@ -1374,18 +1370,18 @@ export class BcMuaHangService {
         }
     }
     async bangKeChungTuDonHang({
-        ct_tu_ng,
-        ct_den_ng,
-        so_ct_tu,
-        so_ct_den,
+        ngay_ct1,
+        ngay_ct2,
+        chung_tu_tu_so,
+        den_so,
         ma_tai_khoan,
         tk_du,
         ma_dvcs = 'CTY',
     }) {
         try {
             // Chuẩn hóa ngày
-            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_tu_ng));
-            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ct_den_ng));
+            const ctTuNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct1));
+            const ctDenNg = formatDateToYYYYMMDD(parseDDMMYYYY(ngay_ct2));
 
             // Build condition
             let conditionParts: string[] = ['1=1'];
@@ -1395,14 +1391,14 @@ export class BcMuaHangService {
             }
 
             // Điều kiện số chứng từ (dùng padl + fsize như trong proc gốc)
-            if (so_ct_tu?.trim()) {
+            if (chung_tu_tu_so) {
                 conditionParts.push(
-                    `and (so_ct >= dbo.padl('${so_ct_tu.trim()}', dbo.fsize('ct00','so_ct'), ' '))`
+                    `and (so_ct >= dbo.padl('${chung_tu_tu_so.trim()}', dbo.fsize('ct00','so_ct'), ' '))`
                 );
             }
-            if (so_ct_den?.trim()) {
+            if (den_so) {
                 conditionParts.push(
-                    `and (so_ct <= dbo.padl('${so_ct_den.trim()}', dbo.fsize('ct00','so_ct'), ' '))`
+                    `and (so_ct <= dbo.padl('${den_so.trim()}', dbo.fsize('ct00','so_ct'), ' '))`
                 );
             }
 
